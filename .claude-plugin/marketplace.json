@@ -1,0 +1,20 @@
+{
+  "name": "getv-design",
+  "owner": {
+    "name": "vDesign",
+    "email": "sagar@getv.design",
+    "url": "https://getv.design"
+  },
+  "metadata": {
+    "description": "vDesign's plugin: the skill that teaches an agent the .vd format, and the vDesign connector."
+  },
+  "plugins": [
+    {
+      "name": "vdesign",
+      "source": "./",
+      "description": "Create and edit vDesign documents — posters, slides, hero sections, card grids — that stay editable and relational instead of being flattened to fixed coordinates.",
+      "category": "design",
+      "homepage": "https://getv.design/docs"
+    }
+  ]
+}

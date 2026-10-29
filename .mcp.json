@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "vdesign": {
+      "type": "http",
+      "url": "https://mcp.getv.design/mcp"
+    }
+  }
+}

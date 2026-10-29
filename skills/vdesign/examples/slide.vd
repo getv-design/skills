@@ -1,0 +1,15 @@
+version 4
+kind design
+title "Title slide"
+$ink = #101014
+$paper = #fafafa
+$accent = #d64545
+$title = 56
+$sub = 22
+
+frame slide w=1600 h=900 background=ink
+  text slide.title x=(parent.cx - self.w / 2) y=300 w=1100 h=68 size=$title weight=700 align=center fill=paper
+    "The document is the artifact"
+  rect rule x=(parent.cx - self.w / 2) y=(@slide.title.bottom + 40) w=120 h=4 fill=accent radius=2
+  text slide.sub x=(parent.cx - self.w / 2) y=(@rule.bottom + 40) w=900 h=27 size=$sub align=center fill=paper opacity=0.7
+    "vDesign — an open substrate for the agent era"

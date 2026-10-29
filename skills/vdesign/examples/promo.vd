@@ -1,0 +1,46 @@
+version 4
+kind design
+title "Pulse launch promo"
+$ink = #0e0e12
+$paper = #f7f7f2
+$lime = #d7ff3a
+$muted = #8a8a96
+$pad = 88
+
+frame promo x=0 y=0 w=3400 h=1350 background=ink
+  frame hook x=0 y=0 w=1080 h=1350 background=ink
+    text hook.kicker x=$pad y=360 w=(100% - $pad * 2) h=34 size=26 weight=700 letterSpacing=4 fill=lime
+      "INTRODUCING PULSE"
+    text hook.title x=$pad y=(@hook.kicker.bottom + 28) w=(100% - $pad * 2) h=360 size=112 weight=800 lineHeight=1.05 fill=paper
+      "Reports that "
+      "write themselves" fill=lime
+    vector hook.underline x=$pad y=(@hook.title.bottom + 12) w=520 h=24 view="0 0 520 24" d="M4 16 C130 2 300 2 516 12" fill=none stroke=lime strokeWidth=8 cap=round
+  frame proof x=1160 y=0 w=1080 h=1350 background=ink
+    text proof.value x=$pad y=420 w=(100% - $pad * 2) h=170 size=140 weight=800 fill=paper
+      "12,480"
+    text proof.label x=$pad y=(@proof.value.bottom + 8) w=(100% - $pad * 2) h=40 size=30 fill=muted
+      "reports sent last week"
+    group proof.bars
+      rect proof.bar.1 x=$pad y=1150 w=120 h=90 fill=muted radius=12
+      rect proof.bar.2 x=(prev.right + 32) y=1090 w=120 h=150 fill=muted radius=12
+      rect proof.bar.3 x=(prev.right + 32) y=1010 w=120 h=230 fill=muted radius=12
+      rect proof.bar.4 x=(prev.right + 32) y=920 w=120 h=320 fill=lime radius=12
+  frame end x=2320 y=0 w=1080 h=1350 background=ink
+    text end.logo x=$pad y=520 w=(100% - $pad * 2) h=170 size=140 weight=800 align=center fill=lime
+      "pulse"
+    text end.cta x=$pad y=(@end.logo.bottom + 24) w=(100% - $pad * 2) h=44 size=34 weight=600 align=center fill=paper
+      "Try it free at pulse.app"
+
+motion promo w=1080 h=1350
+  camera hook duration=0
+  hook.kicker enter=fade duration=500
+  hook.title enter=rise by=word stagger=80
+  hook.underline enter=draw duration=600
+  camera proof delay=400
+  proof.value enter=count from=0 together
+  proof.label enter=fade with=proof.value
+  proof.bars enter=grow from=bottom stagger=120 after=proof.value
+  camera end delay=600
+  end.logo enter=pop
+  end.cta enter=rise by=word stagger=60
+  end.cta emphasis=pulse delay=400

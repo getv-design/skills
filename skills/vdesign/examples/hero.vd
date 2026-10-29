@@ -1,0 +1,24 @@
+version 4
+kind design
+title "Launch hero"
+$gap = 24
+$paper = #ffffff
+$accent = #5b5bd6
+$highlight = #ffd166
+$display = 40
+$body = 16
+
+font display = Inter
+  fallback "system-ui, -apple-system, Segoe UI, sans-serif"
+
+frame page w=1280 h=720 background=paper
+  rect hero.bg x=$gap y=$gap w=(100% - $gap * 2) h=320 fill=accent radius=20
+  rect logo x=(@hero.bg.left + 40) y=(@hero.bg.top + 40) w=72 h=72 fill=paper radius=16
+  text hero.title x=(@logo.right + $gap) y=@logo.top w=680 h=96 font=display size=$display weight=700 fill=paper
+    "An open document substrate for the "
+    "agent era" fill=highlight
+  text hero.sub x=@hero.title.left y=(@hero.title.bottom + 12) w=560 h=20 font=display size=$body fill=paper opacity=0.8
+    "The document is the artifact, not the code that made it."
+  rect cta x=@hero.title.left y=(@hero.sub.bottom + $gap) w=180 h=48 fill=paper radius=10
+  text cta.label x=@cta.x y=@cta.y w=@cta.w h=@cta.h font=display size=$body weight=600 align=center valign=middle fill=accent
+    "Read the spec"

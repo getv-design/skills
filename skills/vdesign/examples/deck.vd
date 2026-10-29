@@ -1,0 +1,48 @@
+version 4
+kind design
+title "Launch plan"
+$ink = #101014
+$paper = #fafafa
+$muted = #ececf1
+$accent = #d64545
+$gap = 64
+
+frame intro x=0 y=0 w=1600 h=900 background=paper
+  text intro.title x=$gap y=240 w=1100 h=116 size=96 weight=800 fill=ink
+    "Launch plan"
+  text intro.sub x=$gap y=(@intro.title.bottom + 24) w=900 h=39 size=32 fill=ink opacity=0.6
+    "What ships, when, and what it costs"
+  group intro.cta
+    rect intro.cta.bg x=$gap y=620 w=280 h=72 fill=accent radius=36
+    text intro.cta.label x=@intro.cta.bg.x y=@intro.cta.bg.y w=@intro.cta.bg.w h=@intro.cta.bg.h size=24 weight=700 align=center valign=middle fill=paper
+      "See pricing"
+
+frame plan x=1700 y=0 w=1600 h=900 background=paper
+  text plan.title x=$gap y=$gap w=1000 h=58 size=48 weight=800 fill=ink
+    "Three steps"
+  rect plan.one x=$gap y=240 w=((100% - $gap * 4) / 3) h=480 fill=muted radius=24
+  rect plan.two x=(@plan.one.right + $gap) y=(prev.y) w=@plan.one.w h=@plan.one.h fill=muted radius=24
+  rect plan.three x=(@plan.two.right + $gap) y=(prev.y) w=@plan.one.w h=@plan.one.h fill=muted radius=24
+
+frame pricing x=3400 y=0 w=1600 h=900 background=ink
+  text pricing.title x=$gap y=$gap w=1000 h=58 size=48 weight=800 fill=paper
+    "Pricing"
+  text pricing.price x=$gap y=300 w=800 h=154 size=128 weight=800 fill=accent
+    "$49 a month"
+  text pricing.back x=$gap y=780 w=200 h=34 size=28 fill=paper
+    "← Back"
+
+motion intro enter=fade
+  intro.title enter=rise
+  intro.sub enter=fade delay=150 together
+  intro.cta enter=pop go=#pricing
+
+motion plan enter=push
+  plan.title enter=fade
+  plan.one enter=rise step
+  plan.two enter=rise step
+  plan.three enter=rise step
+
+motion pricing enter=slide
+  pricing.price enter=pop
+  pricing.back go=back
