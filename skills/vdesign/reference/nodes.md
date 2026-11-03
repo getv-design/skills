@@ -1,6 +1,6 @@
 # Node types
 
-Nine. Every line is `<type> <id> key=value …`, and children are indented two spaces under
+Eleven. Every line is `<type> <id> key=value …`, and children are indented two spaces under
 their container.
 
 Every node also accepts `name="…"`, a human label with no effect on layout.
@@ -9,24 +9,22 @@ Every node but the canvas also accepts two bare flags, written last on the line:
 
 - `hidden` — not drawn anywhere, export included. It still resolves, so `@badge.right`
   keeps working while `badge` is hidden. Hiding a container hides what is in it.
-- `locked` — the person's pointer passes over it on the canvas. It changes nothing for you:
-  you can still edit it, and you may add or remove the flag when asked.
+- `locked` — the person's pointer passes over it; you can still edit it, and add or remove
+  the flag when asked.
 
 ## `frame` — a page
 
-The node you almost always start with. A frame is a box with **its own coordinate space**:
-everything inside it is positioned from its top-left corner, and `%` inside it measures the
-frame rather than the document.
+The node you almost always start with: a box with **its own coordinate space**. Inside it,
+positions start at its top-left corner, and `%` measures the frame.
 
-A document may hold as many as you like, side by side — that is how it holds several pages,
-slides or artboards. Frames also nest, which is how you get a card with a boundary of its
-own.
+A document holds as many as you like: pages, slides or artboards. Frames nest, as cards.
 
 | property     | type                 |                                      |
 | ------------ | -------------------- | ------------------------------------ |
 | `x`, `y`     | number or expression | where the page sits; both default 0  |
 | `w`, `h`     | number or expression | the page size                        |
 | `background` | token or colour      | drawn behind everything on this page |
+| `radius`     | see Corners          | rounds the background, and the clip  |
 | `clip`       | flag                 | hide what overflows; off by default  |
 | `skip`       | flag                 | left out of Play; top-level only     |
 | `component`  | flag                 | other pages place copies of it       |
@@ -42,14 +40,13 @@ frame notes x=1380 w=1280 h=720 background=paper
     "What we agreed"
 ```
 
-Lay several pages out **left to right with a gap between them**, as above: they must not
-overlap, because nothing stops one page being drawn on top of another.
+Lay pages out **left to right with a gap**, as above: overlapping pages draw over each
+other.
 
 ## `canvas` — the surface
 
-The surface the frames sit on, and the outermost node. **You almost never write it.** A
-document that begins with frames gets one automatically, which is why the example above has
-no `canvas` line and no extra indent level.
+The outermost node, under the frames. **You almost never write it**: a document that
+begins with frames gets one.
 
 Write it only for a single-page document with shapes directly on it, where it is the page:
 
@@ -65,20 +62,19 @@ canvas page w=1280 h=720 background=paper
 | `w`, `h`     | number or expression | optional; absent means unbounded   |
 | `background` | token or colour      | only meaningful when it has a size |
 
-A canvas must be the **only** top-level node. Writing one and then a frame beside it is an
-error; put the frames inside it, or leave it out entirely.
+A canvas must be the **only** top-level node: put frames inside it, or leave it out.
 
 ## `rect` — a box
 
-| property      | type                 | default        |
-| ------------- | -------------------- | -------------- |
-| `x`, `y`      | number or expression | required       |
-| `w`, `h`      | number or expression | required       |
-| `fill`        | token or colour      | `#CBD5E1`      |
-| `stroke`      | token or colour      | none           |
-| `strokeWidth` | number or expression | 1 when stroked |
-| `radius`      | number or expression | 0              |
-| `opacity`     | number or expression | 1              |
+| property      | type                 | default   |
+| ------------- | -------------------- | --------- |
+| `x`, `y`      | number or expression | required  |
+| `w`, `h`      | number or expression | required  |
+| `fill`        | token or colour      | `#CBD5E1` |
+| `stroke`      | token or colour      | none      |
+| `strokeWidth` | number or expression | 0         |
+| `radius`      | see Corners          | 0         |
+| `opacity`     | number or expression | 1         |
 
 ```vd
 rect hero.bg x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent radius=16
@@ -101,7 +97,7 @@ The ellipse inscribed in its box. A circle is `w` equal to `h`.
 ellipse avatar.ring x=24 y=24 w=48 h=48 fill=none stroke=accent strokeWidth=2
 ```
 
-## `vector` — any shape: icons, arrows, dividers, logos
+## `vector` — any shape: icons, logos
 
 An SVG path, drawn into a box.
 
@@ -128,22 +124,24 @@ is the path's own coordinate space, spelled the way SVG spells a `viewBox`, and 
 **stretched onto `x y w h`**: an icon drawn on a 24-unit grid keeps its numbers and is
 sized by `w` and `h` alone.
 
-- **Over MCP, place an icon with `vd_add_icon`** rather than writing one: it knows the
-  Lucide set and writes this node for you. Otherwise, **copy the icon's `d` and its
-  `viewBox` verbatim** into `d` and `view`.
+- **Over MCP, place an icon with `vd_add_icon`**, which writes this node; otherwise
+  **copy the icon's `d` and `viewBox` verbatim** into `d` and `view`.
 - The stroke is in page units and does not grow with `view`: an icon drawn with
   `strokeWidth=2` at 24 wants 4 at 48. A dot drawn as a tiny circle needs a stroke at
   least its diameter to read as solid.
-  Do not rescale the numbers; change `w` and `h`.
 - A line icon wants `fill=none` and a `stroke`. Without `fill=none` the shape is filled
   grey by default.
-- Without `view`, the path draws at 1:1 inside its box: `vector rule x=0 y=100 w=400 h=0
-d="M0 0 H400" stroke=ink strokeWidth=1` is a divider.
+- Without `view`, the path draws at 1:1 inside its box. A divider is a `connector`.
 - A path that cannot be read draws up to its first error and reports `bad-path`.
 
 To turn a `rect` or `ellipse` into a free-form shape, replace its line with a `vector` of
 the same id — same `x y w h`, `view="0 0 <w> <h>"`, and a `d` that traces it. The person
 can do the same with **Convert to vector** (⇧⌘O) and then drag its points.
+
+To make one shape of several — a badge from a ring and a dot, a card with a notch cut out —
+`merge` them (`reference/edits.md`): `merge union badge.ring badge.dot` replaces them with
+one `vector`. The person has the same as **Union**, **Subtract**, **Intersect** and
+**Exclude** (⌥⇧U, ⌥⇧S, ⌥⇧I, ⌥⇧X).
 
 ## `image` — a picture
 
@@ -153,7 +151,8 @@ can do the same with **Convert to vector** (⇧⌘O) and then drag its points.
 | `w`, `h`  | number or expression       | required |
 | `src`     | a name from `asset`        | required |
 | `fit`     | `cover`, `contain`, `fill` | `fill`   |
-| `radius`  | number or expression       | 0        |
+| `mask`    | the id of a shape          | none     |
+| `radius`  | see Corners                | 0        |
 | `opacity` | number or expression       | 1        |
 
 ```vd
@@ -166,14 +165,58 @@ image cover.photo x=0 y=0 w=(100%) h=480 src=hero fit=cover
 URL**. `cover` fills the box and crops; `contain` fits the whole picture inside
 it; `fill` stretches.
 
-**You cannot invent an asset.** A registry line needs the content hash and byte
-count of bytes that actually exist in the file, so `asset` lines are written by
-whatever put the bytes there — a paste, an import, or an `add-image` tool. What
-you can do is refer to one that is already declared, move it, resize it, or
-change its `fit`. Referring to a name with no `asset` line reports
-`missing-asset` and, in the editor, draws a **slot** — a box labelled with the
-node's `name` that the person drops a picture into. That is how you leave room for
-a picture you cannot send; see "Images" in the overview.
+**You cannot invent an asset**: its line holds the hash and size of real bytes,
+written by whatever added them (a paste, an import, `vd_add_asset`). A name with
+no `asset` line reports `missing-asset` and draws a **slot**, a box labelled with
+the node's `name` that the person drops a picture into: room for a picture you
+cannot send.
+
+### A picture in a shape: `mask`
+
+`mask` names a `rect`, `ellipse` or `vector` on the same page, and the picture is cut to
+its outline: a round avatar, a photo in a blob. The shape is **not drawn**: only its
+outline counts (its `rotation`, corners, a vector's `d`, `view` and `rule`).
+
+```vd
+ellipse avatar.shape x=40 y=40 w=120 h=120
+image avatar.photo x=20 y=30 w=180 h=140 src=face fit=cover mask=avatar.shape
+```
+
+- **The two boxes are the crop.** The picture keeps its own `x y w h`; move it and the
+  shape stays put, so the part of the photo inside the circle changes. To move the whole
+  thing, move both by the same amount.
+- Where the shape sits in the layers does not matter.
+- A shape with holes masks with its holes when it says `rule=evenodd`, which is what
+  `merge` writes for a ring or a cut-out.
+- The picture's corners, `rotation`, `opacity`, `blend` and `shadow` still apply; the
+  shadow follows the cut.
+- One shape may mask several pictures, hidden or not.
+- Naming nothing is `unknown-reference`; a picture, frame, text or itself,
+  `mask-not-a-shape`; a shape on another page, `mask-wrong-page`; one with no size,
+  `mask-empty`. Each draws the picture **whole** and the shape as an ordinary shape.
+- Inside a component, write the shape's own id: each instance's picture is cut by that
+  instance's copy of the shape.
+- `unset avatar.photo mask` lets go: the picture draws whole and the shape draws again.
+  `delete avatar.shape` unsets `mask` on what it cut, in the same step.
+
+The person has the same as **Mask with shape** and **Release mask** (⌥⌘M), and
+double-clicks a masked picture to drag it inside its shape.
+
+## `video` — a clip that plays
+
+An `image` that plays: `x`, `y`, `w`, `h`, `src` (a `video/mp4` or `video/webm` asset),
+`fit`, `mask`, `radius` and `opacity` as there, and the file's clock in milliseconds:
+
+```vd
+asset reel = video/mp4 hash=sha256-9b1e04c2… bytes=4100000 ms=12000
+
+video hero.reel x=0 y=0 w=(100%) h=540 src=reel fit=cover start=2000 end=8000 poster=4000 muted loop
+```
+
+- `start`, `end` trim it; `poster` is the frame stills show (else `start`).
+- A timed page plays it from its start, then holds the last frame, or `loop`s. `muted`
+  silences it.
+- Add one with `vd_add_asset`; a name with no clip is a slot.
 
 ## `text` — a box of text
 
@@ -278,6 +321,23 @@ frame billing x=1540 y=0 w=1440 h=900
   property it names. Never copy a component's parts onto a page to vary them — override, or
   make a second component.
 
+## `connector` — a line, or an arrow joining nodes
+
+Placed by its ends, `x1`, `y1`, `x2`, `y2`, not a box. An end written as a reference
+follows that node when it moves:
+
+```vd
+connector flow.a2b x1=@step1.right y1=@step1.cy x2=@step2.left y2=@step2.cy end=arrow
+connector rule x1=40 y1=500 x2=520 y2=500 stroke=muted dash="4 4"
+```
+
+- `route=`: `straight` (default), `elbow` or `curve`. An end on a side leaves along it.
+- `start=`, `end=`: `none` (default), `arrow`, `triangle`, `dot`, `bar`.
+- A dark line 2 wide, or `stroke` and `strokeWidth`; also `dash`, `cap`, `opacity`,
+  `blend`, `shadow`, `blur`.
+- Its box is its ends' bounds, so a label is a `text` centred on `@flow.a2b.cx`.
+- An end on a group or on another page is a warning.
+
 ## `group` — structure, and nothing else
 
 ```vd
@@ -286,20 +346,77 @@ group cards
   rect card.2 x=(@card.1.right + $gap) y=(prev.y) w=@card.1.w h=120
 ```
 
-A group has **no `x`, `y`, `w` or `h`**, and it is not a mistake that it does not. A frame
-derived from its children would close a loop — a child's `w=(100%)` would read the group's
-width, which would read the child's — so a group is transparent to layout. Its children keep
+A group has **no `x`, `y`, `w` or `h`**: it is transparent to layout. Its children keep
 the coordinate space of whatever contains the group, and `parent`, `prev`, `next` and `%`
 see straight through it.
 
-Group things because they belong together, and because grouping breaks no expression.
+Group what belongs together; it breaks no expression.
+
+## Corners: radius
+
+`rect`, `image`, `video` and `frame` round their corners with `radius`. One number rounds all four:
+
+```vd
+rect card x=0 y=0 w=320 h=200 fill=#F1F5F9 radius=16
+```
+
+**Corners that differ take CSS's shorthand, in quotes**: top-left, then clockwise — top-right,
+bottom-right, bottom-left. A tab rounded only on top:
+
+```vd
+rect tab x=0 y=0 w=320 h=48 fill=#2563EB radius="16 16 0 0"
+```
+
+As in CSS, two values are top-left and bottom-right, then top-right and bottom-left
+(`radius="24 0"`), and three are top-left, then top-right and bottom-left, then bottom-right.
+The shorthand holds plain numbers only.
+
+**To bind a corner, or to change one corner of a bound radius**, write that corner on its
+own: `radiusTL`, `radiusTR`, `radiusBR` and `radiusBL` each take a number or an expression,
+and each overrides `radius` for its corner.
+
+```vd
+$r = 12
+
+rect chip x=0 y=0 w=120 h=40 fill=#2563EB radius=$r radiusBL=0
+```
+
+- A radius too big for its box is drawn as CSS draws it: all four shrink together until
+  they fit. `radius=999` on a button is a pill.
+- On a `frame`, `radius` rounds the `background`, the shadow and, with `clip`, what it
+  clips: a card is a frame with `background`, `radius` and `clip`.
+- In a patch, `radius` sets every corner, as CSS's shorthand does: `set card radius=0`
+  squares a card whatever its corners said, a part of an instance included, and
+  `set card radius="16 16 0 0"` replaces `radius` with four corners. In one statement the
+  later spelling wins. `set card radiusBL=0` changes that corner alone.
+- `unset card radius` removes `radius` and leaves any corner of its own. To square every
+  corner, write `set card radius=0`.
+
+## Strokes
+
+`frame`, `rect`, `ellipse`, `vector`, `image`, `video` and `text` take `stroke=` (token or colour)
+and `strokeWidth=`. Give both: no width draws nothing.
+
+```vd
+frame card x=0 y=0 w=320 h=200 radius=16 clip stroke=line strokeWidth=1
+rect dots x=400 y=0 w=120 h=40 fill=none stroke=accent strokeWidth=3 dash="0 8" cap=round
+```
+
+- `dash="6 4"`: dash, gap, repeating, quoted. `dash="0 8"` with `cap=round` is dotted.
+- `cap=` (`butt`, `round`, `square`) ends each dash on a `rect`, `ellipse`, `frame` or
+  `image`.
+- `strokeAlign=` is `center` (default), `inside` or `outside`, for a closed outline
+  (`stroke-align-open` on an open path: drawn centred). `text` has none. On a `vector`,
+  dashes are not exact; an outline that crosses itself draws across its fill, so
+  `merge union` it first. A page's border needs `inside`: the page edge cuts the rest.
+- A `frame`'s stroke draws over its contents; an `image`'s follows its corners or `mask`;
+  a `text`'s outlines the letters behind the fill.
 
 ## Rotation
 
-`rect`, `ellipse`, `vector`, `image` and `text` take `rotation=` — degrees, clockwise,
-about the centre of the box. `x y w h` stay the **unrotated** box, so `@card.right` still
-means the right edge of the box as written; a rotated node is placed by its box and then
-turned. Frames and groups do not rotate. `rotation` is a number, so `rotation=$tilt` works.
+`rect`, `ellipse`, `vector`, `image`, `video` and `text` take `rotation=` — degrees, clockwise,
+about the centre of the box. `x y w h` stay the **unrotated** box, so `@card.right`
+means its right edge as written. Frames and groups do not rotate. `rotation` is a number, so `rotation=$tilt` works.
 
 ```vd
 rect sticker x=520 y=60 w=160 h=48 radius=24 fill=accent rotation=-8
@@ -310,19 +427,22 @@ text sticker.label x=520 y=72 w=160 h=24 align=center fill=#fff rotation=-8
 Give things that should turn together the same box centre, or the same rotation and
 matching boxes, as above.
 
-## Effects: blend and shadow
+## Effects
 
-`frame`, `rect`, `ellipse`, `vector`, `image` and `text` also take:
+`frame`, `rect`, `ellipse`, `vector`, `image`, `video` and `text` also take:
 
 - `blend=` — how the node mixes with what is under it: `multiply`, `screen`, `overlay`,
   `darken`, `lighten`, `color-dodge`, `color-burn`, `hard-light`, `soft-light`,
   `difference`, `exclusion`, `hue`, `saturation`, `color`, `luminosity`. Omit it for
   normal. A node blends only with the document beneath it. Groups take no blend.
-- `shadow=` — drop shadows in CSS `box-shadow` spelling, quoted: `x y blur spread colour`,
-  several separated by commas, the first on top. The colour may be a token. `inset` is not
-  supported. A shadow follows the shape — round for an ellipse, glyph-shaped for text — and
-  never changes the box, so layout and `@` references ignore it. Put a shadow you reuse in
-  a token.
+- `shadow=` — CSS `box-shadow` spelling, quoted: `x y blur spread colour`, several
+  separated by commas, the first on top; `inset` first makes an inner shadow. The colour
+  may be a token. A shadow follows the shape and never changes the box. Put one you reuse
+  in a token.
+- `blur=` — layer blur in px: the node and its shadows, a frame with all it holds.
+- `backdrop=` — background blur, not on `image`, `video` or `text`: what lies under the node on
+  its page, blurred, seen through it. Glass is this with a translucent fill and a light
+  stroke.
 
 ```vd
 $lift = "0 1 2 0 #0F172A14, 0 8 24 -4 #0F172A29"
@@ -334,7 +454,7 @@ rect card x=64 y=520 w=320 h=200 radius=16 fill=#FFFFFF shadow=lift
 
 ## Ids
 
-An id is how everything else refers to a node, so make it guessable: `hero.title`,
+An id is how other nodes refer to one, so make it guessable: `hero.title`,
 `card.1`, `nav.logo`, `footer.legal`. Dots are ordinary characters and read as structure.
 
 Ids must be unique across the document.

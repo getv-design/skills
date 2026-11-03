@@ -163,7 +163,8 @@ frame pricing x=1380 y=0 w=1280 h=720
 ## Editing an existing document
 
 When given a document and asked to change it, reply with **statements**, not a new
-document. Five verbs, plus `title` to rename the document:
+document. Five verbs, plus `title` to rename the document and `merge` to make one shape of
+several:
 
 ```vd-patch
 title "Pricing page"
@@ -175,6 +176,7 @@ insert rect card.4 after card.3 x=(@card.3.right + $gap) y=(prev.y) w=@card.1.w 
 insert frame pricing x=(@page.right + 100) w=@page.w h=@page.h background=paper
 move logo before hero.bg
 delete hero.tagline
+merge union badge.ring badge.dot as badge.mark
 ```
 
 An `insert` with no placement lands on the canvas, which in a multi-page document is
@@ -300,7 +302,7 @@ Each file is named by its path in this skill. Over MCP, `vd_skill` returns any o
 path; in the flattened system prompt they follow below.
 
 - `reference/grammar.md` — the expression language in full: edges, percentages, relative
-  references, precedence; plus tokens, paint (colours and gradients), fonts and the asset
+  references, precedence; plus tokens, paint (colours, gradients, layers), fonts and the asset
   registry.
 - `reference/nodes.md` — every node type and every property it accepts: `frame`,
   `canvas`, `rect`, `ellipse`, `vector`, `image`, `text`, `instance`, `group`.

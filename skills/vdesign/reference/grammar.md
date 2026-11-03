@@ -2,7 +2,7 @@
 
 Expressions are stored as written and resolved when the document is read. They form a
 one-way graph: a value may read other values, and nothing may read back. A cycle is
-reported as an error rather than solved.
+an error, not solved.
 
 ## What an expression can contain
 
@@ -21,8 +21,8 @@ There are **no functions** — no `min`, `max`, `clamp`, `abs`. If you need one,
 a literal or the layout needs rethinking.
 
 There are **no units** either: a value is a number, a percentage, or an expression —
-`h=480`, not `h=480px`; `w=(100%)`, not `w=100vw`. The one place a unit appears is inside a
-quoted gradient, which is CSS spelling: `"linear-gradient(135deg, …)"`.
+`h=480`, not `h=480px`; `w=(100%)`, not `w=100vw`. Units appear only inside a quoted
+gradient, which is CSS spelling.
 
 ## Edges
 
@@ -57,11 +57,8 @@ w=(100% - $gap * 2)             full width inside a gutter
 w=((100% - $gap * 4) / 3)       one of three columns with gaps between
 ```
 
-A group is transparent here: a percentage inside a group measures the frame around the
-group, not the group.
-
-A percentage on a frame itself, or on anything sitting directly on an unsized canvas, has no
-box to measure against and is reported as `percent-without-parent`.
+Inside a group, a percentage measures the frame around the group. One on a frame, or on
+anything directly on an unsized canvas, has no box and is `percent-without-parent`.
 
 ## Relative references
 
@@ -73,29 +70,29 @@ y=(prev.bottom + $gap)          stack under it
 w=(parent.w / 2)                half the container
 ```
 
-`prev` and `next` are siblings **in layout order**, which sees through groups: a group
-carries no geometry, so its children behave as though the group were not there. A frame is
-the opposite — it does carry geometry, so `parent` inside one is the frame.
+`prev` and `next` are siblings **in layout order**, which sees through groups (a group
+carries no geometry). A frame does carry geometry, so `parent` inside one is the frame.
 
 Every reference is read in the coordinates of the node that wrote it. Inside a frame,
 `parent.left` and `parent.top` are `0`, `parent.cx` is half the frame's width, and
-`parent.right` is its width — wherever the frame sits on the canvas. A reference to a node
+`parent.right` is its width. A reference to a node
 in another frame means the same point on the page, carried into this frame's coordinates.
 
 ## Which properties accept an expression
 
 Positions, sizes and numeric style properties:
 
-- `frame` — `x`, `y`, `w`, `h`
+- `frame` — `x`, `y`, `w`, `h`, `radius`, and each corner (`radiusTL` and the rest)
 - `canvas` — `w`, `h`
-- `rect` — `x`, `y`, `w`, `h`, `strokeWidth`, `radius`, `opacity`
+- `rect` — `x`, `y`, `w`, `h`, `strokeWidth`, `radius`, each corner, `opacity`
+- `image` — `x`, `y`, `w`, `h`, `radius`, each corner, `opacity`
 - `text` — `x`, `y`, `w`, `h`, `size`, `weight`, `lineHeight`, `letterSpacing`, `opacity`
 
 `fill`, `stroke`, `background` and `font` are **names, not numbers**. They take a token name
 or a literal value; an expression there is reported as `expression-not-supported`.
 
-Marks inside a text run — `weight=700` on one span — are always literals. There is no
-address for "run 2's size", so there is nothing an expression there could resolve against.
+Marks inside a text run — `weight=700` on one span — are always literals: a run has no
+address for an expression to resolve against.
 
 ## Writing values
 
@@ -110,7 +107,7 @@ address for "run 2's size", so there is nothing an expression there could resolv
 | true                              | `italic`              |
 | false                             | omit it               |
 
-Quoting uses JSON's rules, so `\"` and `\n` mean what they do in JSON.
+Quoting follows JSON: `\"` and `\n` work.
 
 ## Tokens
 
@@ -124,7 +121,7 @@ $label = "Section heading"
 A bare numeric token is a number; quote it to keep it a string. A token may not hold an
 expression — it is a value, not a formula.
 
-## Paint: colours and gradients
+## Paint: colours, gradients, layers
 
 `fill`, `stroke`, a frame's `background` and a run's `fill` take a **paint**: a colour, a
 token naming one, or a gradient in CSS spelling. Quote a gradient — it has spaces.
@@ -148,6 +145,12 @@ text hero.title x=64 y=120 w=560 h=64 size=48 weight=700 fill="linear-gradient(9
 - A gradient spans the node's box; on text it sweeps across the whole box, not each run.
 - Not supported: `conic-gradient`, `repeating-*`, sizes such as `closest-side`, and a token
   holding a gradient used as a stop of another gradient.
+- **Layers.** A shape's `fill` and a frame's `background` take a list, first on top, as a
+  CSS background: `fill="linear-gradient(#0000, #000C), image(hero), #fff"`. A token may
+  hold the whole list. `stroke` and a run's `fill` take one paint.
+- `image(<asset>, cover|contain|fill)` is a picture layer, fitted as `image`'s `fit` is
+  (default `cover`), cut by the corners and outline. One naming no asset is the warning
+  `fill-asset-missing`; the other layers still draw.
 
 ## Fonts
 
@@ -179,17 +182,14 @@ asset logo = image/png hash=sha256-9f2c4e8a… bytes=24567
 asset hero = image/jpeg hash=sha256-1a77b0c3… bytes=412330 credit="Jane Doe / Unsplash" source="https://unsplash.com/photos/abc" license=Unsplash
 ```
 
-One asset, one line, including its provenance. `hash` and `bytes` are required:
-they identify the block of bytes further down the file that carries the picture.
+One asset, one line, with its provenance. `hash` and `bytes` are required: they
+name the picture's bytes further down the file.
 `credit`, `source` and `license` are optional in the grammar but **not optional
 for an image you found** — the bytes end up inside a file someone re-shares.
 
 A `.vd` file is a **text head and a payload tail**, separated by a line reading
 `--- payload base64 ---`. Everything above it is the design, and is all you ever
 read or write. Everything below it is one line per asset: its hash, a space, and
-its bytes as base64. You never write that half by hand, and a tool reading a
-document for you will not show it to you.
-
-This is why the registry declares `bytes` and a media type up front: a reader
-knows what a document depends on, and how large each of those things is, before
-any of the bytes arrive.
+its bytes as base64. You never write that half, and tools do not show it to you.
+The registry's `bytes` and media type tell a reader what a document needs, and
+how large, before any bytes arrive.

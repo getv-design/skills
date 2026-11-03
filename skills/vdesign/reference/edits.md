@@ -14,6 +14,11 @@ set hero.title size=34 weight=700          one or more properties
 set card.2 w=(@card.1.w * 2)               an expression, same rules as anywhere
 ```
 
+`radius` is CSS's shorthand here as in CSS: writing it sets every corner, so `set card
+radius=0` squares a card with corners of its own, and `set card radius="16 16 0 0"` gives it
+four. `set card radiusTL=0` changes one corner and leaves the rest. When one statement
+writes both, the later wins: `set card radius=8 radiusTL=0` rounds three corners.
+
 **Reach for the token first.** If four cards are laid out with `$gap`, "more breathing
 room" is `set $gap = 40` — one line, and the relationships survive. Writing four `set`
 statements with new coordinates destroys exactly what the document was for.
@@ -39,16 +44,33 @@ Use one or the other, never both in a statement.
 Rewording is always `set`. Never `delete` and `insert` to change copy: the node loses its
 place in the document and every `@` reference to it breaks.
 
+A picture is put in a shape by naming the shape, and the crop is where the picture's own
+box sits under it (`reference/nodes.md`, "A picture in a shape"):
+
+```vd-patch
+set avatar.photo mask=avatar.shape
+set avatar.photo x=10 y=20
+```
+
+A `set` writes exactly what it says, so moving or resizing a masked picture with `set`
+**crops** it: the shape stays where it is. To move both, set both by the same amount (or
+put them in a group and move that).
+
 ## `unset`
 
 Removes a property so its default comes back.
 
 ```vd-patch
 unset hero.sub opacity
-unset card.1 stroke strokeWidth
+unset card.1 stroke strokeWidth dash strokeAlign
+unset avatar.photo mask
 ```
 
 For a token, use `delete $name` — a token is a thing, not a property.
+
+`unset card radius` takes away `radius` only: a corner written on its own (`radiusTL` and
+the rest) stays. `set card radius=0` squares every corner, and `unset card radiusTL
+radiusTR radiusBR radiusBL` hands every corner back to `radius`.
 
 ## `insert`
 
@@ -144,6 +166,53 @@ replace theme dark
   $primary = #F06A3F
 ```
 
+## `merge`
+
+Replaces two or more shapes with one `vector`: what Union, Subtract, Intersect and Exclude
+do in a design tool. Name the verb, then the shapes, in any order; `as` names the result.
+
+```vd-patch
+merge union badge.ring badge.dot as badge.mark
+merge subtract card.bg card.notch
+merge intersect lens.left lens.right as lens
+merge exclude ring.outer ring.inner
+```
+
+| verb        | keeps                                                     |
+| ----------- | --------------------------------------------------------- |
+| `union`     | everything any of them covers                             |
+| `subtract`  | the **bottom-most** shape, minus everything above it      |
+| `intersect` | only where all of them overlap                            |
+| `exclude`   | where an odd number of them overlap: the overlaps cut out |
+
+The result is the bottom-most shape: it keeps that shape's place in the layer order, its
+`name`, `fill`, `stroke`, `opacity`, `blend`, `shadow` and flags, and its id unless `as`
+gives another. Its `d` is the merged outline in a fresh `view`, its box fitted to it, with
+no `rotation`. Rotation and corners are baked into the path; arcs stay curves.
+
+- Inputs are `rect`, `ellipse` and `vector`. **Text is refused** (`merge-not-a-shape`):
+  there is no outline-text yet. So are images, frames and groups; name the shapes inside a
+  group instead.
+- Merge works on **filled areas**. A shape with `fill=none`, drawn by its stroke alone, is
+  refused (`merge-stroke-only`); give it a fill first, or leave it out.
+- A **hidden** shape is refused (`merge-hidden`); `unset` its `hidden` first. A **locked**
+  one merges, and the result is locked if any input was.
+- All of them must be on **one page or frame**. Shapes in different groups on that page
+  are fine, and a group the merge leaves empty is removed; shapes on two pages are refused
+  (`merge-across-frames`). Parts of an instance are refused (`merge-in-instance`): merge
+  the shapes in the component, and every instance follows.
+- `as` names a new id: one already used by a node that is not an input is refused
+  (`duplicate-id`), and so is a property written where the id belongs (`missing-id`). A
+  motion line on the bottom-most shape follows the result to its new id.
+- A result with nothing in it, such as `intersect` of shapes that do not touch, is refused
+  (`merge-empty`) and nothing is removed. If the geometry itself fails, the line is refused
+  as `merge-failed` and nothing changes; the rest of the patch still lands.
+- It is destructive. A `$token` or `@` reference on an input's `x`, `y`, `w`, `h`,
+  `rotation` or corners is gone, written into the path. A node that read a shape the merge
+  removed keeps where it was, as a number. Undo restores the inputs.
+- Merge only what should become one shape for good. To keep a ring editable as two
+  circles, leave it as two circles.
+
 ## Things worth knowing
 
 **Statements apply in order, against a document that grows as they do.** So this works:
@@ -165,6 +234,12 @@ first or delete them too:
 set hero.title x=$gap
 delete logo
 ```
+
+A shape a picture uses as its `mask` is the exception: `delete avatar.shape` also unsets
+`mask` on every picture it cut, in the same patch, and they draw whole. Merging a mask
+shape is fine; the picture is masked by the result. `move` a masked picture to another
+page and **move its shape too**, or the mask is `mask-wrong-page` and the picture draws
+whole.
 
 **Moving a node changes what `prev` and `next` mean** for its neighbours. If siblings are
 chained with `y=(prev.y)`, reordering them is fine — that is the chain doing its job — but
