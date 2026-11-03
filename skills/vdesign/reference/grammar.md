@@ -80,13 +80,10 @@ in another frame means the same point on the page, carried into this frame's coo
 
 ## Which properties accept an expression
 
-Positions, sizes and numeric style properties:
-
-- `frame` — `x`, `y`, `w`, `h`, `radius`, and each corner (`radiusTL` and the rest)
-- `canvas` — `w`, `h`
-- `rect` — `x`, `y`, `w`, `h`, `strokeWidth`, `radius`, each corner, `opacity`
-- `image` — `x`, `y`, `w`, `h`, `radius`, each corner, `opacity`
-- `text` — `x`, `y`, `w`, `h`, `size`, `weight`, `lineHeight`, `letterSpacing`, `opacity`
+Every number a node takes, where its type takes it: `x`, `y`, `w`, `h` (a connector's `x1`,
+`y1`, `x2`, `y2`), `rotation`, `strokeWidth`, `radius` and each corner, `opacity`, `blur`,
+`backdrop`, and a text's `size`, `weight`, `lineHeight` and `letterSpacing`. A video's
+`start`, `end` and `poster` are literals.
 
 `fill`, `stroke`, `background` and `font` are **names, not numbers**. They take a token name
 or a literal value; an expression there is reported as `expression-not-supported`.
@@ -145,7 +142,7 @@ text hero.title x=64 y=120 w=560 h=64 size=48 weight=700 fill="linear-gradient(9
 - A gradient spans the node's box; on text it sweeps across the whole box, not each run.
 - Not supported: `conic-gradient`, `repeating-*`, sizes such as `closest-side`, and a token
   holding a gradient used as a stop of another gradient.
-- **Layers.** A shape's `fill` and a frame's `background` take a list, first on top, as a
+- **Layers.** A shape's `fill` and a frame's or canvas's `background` take a list, first on top, as a
   CSS background: `fill="linear-gradient(#0000, #000C), image(hero), #fff"`. A token may
   hold the whole list. `stroke` and a run's `fill` take one paint.
 - `image(<asset>, cover|contain|fill)` is a picture layer, fitted as `image`'s `fit` is

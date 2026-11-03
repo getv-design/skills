@@ -64,7 +64,7 @@ You never write a direction: going back runs the leaving page's `enter` in rever
 | `wipe`  | revealed behind an edge, `from=left` (or `right top bottom`)                                | hidden the same way |
 | `grow`  | scales up from one side, `from=bottom` (or `top left right`): bars, lines                   | shrinks back        |
 | `count` | a text's number runs from `from=0` up to its written value (`"12,480"`, `"$1.2M"`, `"98%"`) | —                   |
-| `draw`  | a stroked `vector` draws along its path; its fill fades in at the end                       | —                   |
+| `draw`  | a stroked `vector` or a `connector` draws along its path; a fill fades in at the end        | —                   |
 
 The sides `from=` names are `left`, `right`, `top` and `bottom`.
 

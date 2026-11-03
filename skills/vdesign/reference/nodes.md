@@ -23,7 +23,7 @@ A document holds as many as you like: pages, slides or artboards. Frames nest, a
 | ------------ | -------------------- | ------------------------------------ |
 | `x`, `y`     | number or expression | where the page sits; both default 0  |
 | `w`, `h`     | number or expression | the page size                        |
-| `background` | token or colour      | drawn behind everything on this page |
+| `background` | paint or layers      | drawn behind everything on this page |
 | `radius`     | see Corners          | rounds the background, and the clip  |
 | `clip`       | flag                 | hide what overflows; off by default  |
 | `skip`       | flag                 | left out of Play; top-level only     |
@@ -60,7 +60,7 @@ canvas page w=1280 h=720 background=paper
 | property     | type                 |                                    |
 | ------------ | -------------------- | ---------------------------------- |
 | `w`, `h`     | number or expression | optional; absent means unbounded   |
-| `background` | token or colour      | only meaningful when it has a size |
+| `background` | paint or layers      | only meaningful when it has a size |
 
 A canvas must be the **only** top-level node: put frames inside it, or leave it out.
 
@@ -70,7 +70,7 @@ A canvas must be the **only** top-level node: put frames inside it, or leave it 
 | ------------- | -------------------- | --------- |
 | `x`, `y`      | number or expression | required  |
 | `w`, `h`      | number or expression | required  |
-| `fill`        | token or colour      | `#CBD5E1` |
+| `fill`        | paint or layers      | `#CBD5E1` |
 | `stroke`      | token or colour      | none      |
 | `strokeWidth` | number or expression | 0         |
 | `radius`      | see Corners          | 0         |
@@ -88,7 +88,7 @@ The ellipse inscribed in its box. A circle is `w` equal to `h`.
 | ------------- | -------------------- | --------- |
 | `x`, `y`      | number or expression | required  |
 | `w`, `h`      | number or expression | required  |
-| `fill`        | token or colour      | `#CBD5E1` |
+| `fill`        | paint or layers      | `#CBD5E1` |
 | `stroke`      | token or colour      | none      |
 | `strokeWidth` | number or expression | 0         |
 | `opacity`     | number or expression | 1         |
@@ -107,7 +107,7 @@ An SVG path, drawn into a box.
 | `w`, `h`      | number or expression               | required  |
 | `d`           | SVG path data, quoted              | required  |
 | `view`        | `"minX minY width height"`, quoted | `0 0 w h` |
-| `fill`        | token, colour or `none`            | `#CBD5E1` |
+| `fill`        | paint, layers or `none`            | `#CBD5E1` |
 | `stroke`      | token or colour                    | none      |
 | `strokeWidth` | number or expression               | 0         |
 | `opacity`     | number or expression               | 1         |
@@ -403,8 +403,8 @@ rect dots x=400 y=0 w=120 h=40 fill=none stroke=accent strokeWidth=3 dash="0 8" 
 ```
 
 - `dash="6 4"`: dash, gap, repeating, quoted. `dash="0 8"` with `cap=round` is dotted.
-- `cap=` (`butt`, `round`, `square`) ends each dash on a `rect`, `ellipse`, `frame` or
-  `image`.
+- `cap=` (`butt`, `round`, `square`) ends each dash on a `rect`, `ellipse`, `frame`, `image` or
+  `video`.
 - `strokeAlign=` is `center` (default), `inside` or `outside`, for a closed outline
   (`stroke-align-open` on an open path: drawn centred). `text` has none. On a `vector`,
   dashes are not exact; an outline that crosses itself draws across its fill, so

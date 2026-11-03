@@ -305,7 +305,8 @@ path; in the flattened system prompt they follow below.
   references, precedence; plus tokens, paint (colours, gradients, layers), fonts and the asset
   registry.
 - `reference/nodes.md` — every node type and every property it accepts: `frame`,
-  `canvas`, `rect`, `ellipse`, `vector`, `image`, `text`, `instance`, `group`.
+  `canvas`, `rect`, `ellipse`, `vector`, `image`, `video`, `text`, `instance`, `connector`,
+  `group`.
 - `reference/edits.md` — the mutation dialect in full.
 - `reference/motion.md` — motion: page transitions, reveals, buttons, timing, the camera, beats
   and music.
