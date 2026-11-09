@@ -52,7 +52,7 @@ You never write a direction: going back runs the leaving page's `enter` in rever
 
 ## A line
 
-`<node> [enter=…|exit=…|emphasis=…] [from=…] [by=…] [stagger=…] [duration=…] [hold=…] [delay=…] [at=…|after=…|with=…|together|step] [on=…] [ease=…] [go=…]`
+`<node> [enter=…|exit=…|emphasis=…|move to=…] [from=…] [by=…] [stagger=…] [duration=…] [hold=…] [delay=…] [at=…|after=…|with=…|together|step] [on=…] [ease=…] [go=…]`
 
 | effect  | entering                                                                                    | leaving             |
 | ------- | ------------------------------------------------------------------------------------------- | ------------------- |
@@ -68,10 +68,10 @@ You never write a direction: going back runs the leaving page's `enter` in rever
 
 The sides `from=` names are `left`, `right`, `top` and `bottom`.
 
-`emphasis=pulse` stresses a node that is already there — `pulse` is the one stress there is: it swells a little and settles. It goes
-on its own line: `cta emphasis=pulse at=6000`.
+`emphasis=pulse` stresses a node already there: `pulse` swells a little and settles.
 
-A node may have one `enter`, one `exit` and one `emphasis` line — never two on one line.
+One `enter`, `exit` and `emphasis` line per node, one per line; any number of `move` lines:
+`cur move to=b` glides `cur`'s centre to `b`'s. It rests where written, ends where it arrived.
 
 **Pieces.** `by=` takes `word` or `letter`, and splits a text so its pieces enter one after another,
 `stagger=80` ms apart (letters default to 30, words to 80). `stagger=` on a group or frame
@@ -80,8 +80,8 @@ without `by` staggers its children. A line with pieces finishes when its last pi
 **Holding.** `hold=1800` on an `enter` line stays that long, then leaves the way it came — the
 cheapest caption: `cap.1 enter=fade hold=1800`.
 
-**Easing.** `ease=` takes `out` (entrances, the default), `in` (exits), `inout` (camera and emphasis),
-`linear`, or `spring`, which overshoots and settles.
+**Easing.** `ease=` takes `out` (entrances), `in` (exits), `inout` (the rest), `linear`, or
+`spring`, which overshoots.
 
 ## When a line starts
 
@@ -215,7 +215,7 @@ line with an effect, a line that says nothing, or a second `enter`, `exit`, `emp
 for one node. In a patch, naming a node that is not on the page is an error too.
 
 A **warning** keeps the line: a node that is not there or is on another page, a header that is
-not a page, a `go=#` to no frame, an `after=`/`with=` naming no line above, a `count` on text
+not a page, a `go=#` or `to=` naming nothing, an `after=`/`with=` naming no line above, a `count` on text
 with no number, a `draw` on nothing stroked, `by=` on a node that is not text or is rotated,
 `stagger=` on something with no children, a line that starts after `length`, and text on
 screen too briefly to read (`video-text-brief`). For music: no file yet (`music-missing`), a file

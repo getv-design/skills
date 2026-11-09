@@ -6,16 +6,16 @@ an error, not solved.
 
 ## What an expression can contain
 
-|                     |                                                                |
-| ------------------- | -------------------------------------------------------------- |
-| `12`, `-4`, `1.5`   | a number                                                       |
-| `50%`               | a percentage of the containing box — see below                 |
-| `$gap`              | a design token                                                 |
-| `@hero.title.right` | another node's edge, by id                                     |
-| `prev.bottom`       | a relative reference: `parent`, `prev`, `next`, `self`, `root` |
-| `+ - * /`           | arithmetic, with the usual precedence                          |
-| `( )`               | grouping                                                       |
-| unary `-`           | `(-$gap)`                                                      |
+|                       |                                                                |
+| --------------------- | -------------------------------------------------------------- |
+| `12`, `-4`, `1.5`     | a number                                                       |
+| `50%`                 | a percentage of the containing box — see below                 |
+| `$gap`                | a design token                                                 |
+| `@poster.title.right` | another node's edge, by id                                     |
+| `prev.bottom`         | a relative reference: `parent`, `prev`, `next`, `self`, `root` |
+| `+ - * /`             | arithmetic, with the usual precedence                          |
+| `( )`                 | grouping                                                       |
+| unary `-`             | `(-$gap)`                                                      |
 
 There are **no functions** — no `min`, `max`, `clamp`, `abs`. If you need one, the value is
 a literal or the layout needs rethinking.
@@ -39,7 +39,7 @@ Any reference names an edge of the box it points at:
 
 ```text
 x=(@logo.right + $gap)          beside the logo
-y=(@hero.title.bottom + 12)     under the headline
+y=(@poster.title.bottom + 12)     under the headline
 x=(parent.cx - self.w / 2)      centred horizontally
 ```
 
@@ -127,9 +127,9 @@ token naming one, or a gradient in CSS spelling. Quote a gradient — it has spa
 $accent = #2563EB
 $glow = "linear-gradient(135deg, accent, #7C3AED 60%, transparent)"
 
-rect hero.bg x=0 y=0 w=(100%) h=480 fill=glow
-ellipse hero.orb x=600 y=40 w=240 h=240 fill="radial-gradient(circle at 30% 30%, #fff, accent)"
-text hero.title x=64 y=120 w=560 h=64 size=48 weight=700 fill="linear-gradient(90deg, #F43F5E, #F59E0B)"
+rect band x=0 y=0 w=(100%) h=480 fill=glow
+ellipse poster.orb x=600 y=40 w=240 h=240 fill="radial-gradient(circle at 30% 30%, #fff, accent)"
+text poster.title x=64 y=120 w=560 h=64 size=48 weight=700 fill="linear-gradient(90deg, #F43F5E, #F59E0B)"
   "Ship faster"
 ```
 

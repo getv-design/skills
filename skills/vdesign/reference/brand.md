@@ -175,5 +175,5 @@ frame page x=0 y=0 w=1280 h=720 background=background
 - `theme=dark` on the brand line draws the design with its `theme dark` values.
 - `strict` on the brand line refuses a colour written out by an agent; name the role it
   suggests instead.
-- `vd_problems` says where a design breaks its brand: a colour written out
+- Where a design breaks its brand, `vd_problems` says so: a colour written out
   (`literal-colour`, `off-brand-colour`), contrast, fonts, gradients, banned words.

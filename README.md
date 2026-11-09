@@ -1,7 +1,7 @@
 # vDesign skills
 
 The skill that teaches an AI agent to write [vDesign](https://getv.design) documents:
-posters, slide decks, hero sections, card grids and any other laid-out page, in the `.vd`
+posters, diagrams, slide decks, illustrations, web pages and any other visual design, in the `.vd`
 format. A `.vd` keeps sizes, spacing and colours as named relationships rather than fixed
 coordinates, so a design an agent made stays easy to change afterwards, by you or by the
 agent.

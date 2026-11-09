@@ -17,7 +17,7 @@ Every node but the canvas also accepts two bare flags, written last on the line:
 The node you almost always start with: a box with **its own coordinate space**. Inside it,
 positions start at its top-left corner, and `%` measures the frame.
 
-A document holds as many as you like: pages, slides or artboards. Frames nest, as cards.
+A document holds as many as you like: pages, slides or artboards. Frames nest, as an inset that clips.
 
 | property     | type                 |                                      |
 | ------------ | -------------------- | ------------------------------------ |
@@ -33,7 +33,7 @@ A document holds as many as you like: pages, slides or artboards. Frames nest, a
 $gap = 24
 
 frame page w=1280 h=720 background=paper
-  rect hero.bg x=$gap y=$gap w=(100% - $gap * 2) h=320 fill=accent
+  rect band x=$gap y=$gap w=(100% - $gap * 2) h=320 fill=accent
 
 frame notes x=1380 w=1280 h=720 background=paper
   text agenda x=$gap y=$gap w=600 h=48
@@ -54,7 +54,7 @@ Write it only for a single-page document with shapes directly on it, where it is
 $gap = 24
 
 canvas page w=1280 h=720 background=paper
-  rect hero.bg x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent
+  rect band x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent
 ```
 
 | property     | type                 |                                    |
@@ -77,7 +77,7 @@ A canvas must be the **only** top-level node: put frames inside it, or leave it 
 | `opacity`     | number or expression | 1         |
 
 ```vd
-rect hero.bg x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent radius=16
+rect band x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent radius=16
 ```
 
 ## `ellipse` — an oval, or a circle
@@ -138,7 +138,7 @@ To turn a `rect` or `ellipse` into a free-form shape, replace its line with a `v
 the same id — same `x y w h`, `view="0 0 <w> <h>"`, and a `d` that traces it. The person
 can do the same with **Convert to vector** (⇧⌘O) and then drag its points.
 
-To make one shape of several — a badge from a ring and a dot, a card with a notch cut out —
+To make one shape of several — a badge from a ring and a dot, a ticket with a notch cut out —
 `merge` them (`reference/edits.md`): `merge union badge.ring badge.dot` replaces them with
 one `vector`. The person has the same as **Union**, **Subtract**, **Intersect** and
 **Exclude** (⌥⇧U, ⌥⇧S, ⌥⇧I, ⌥⇧X).
@@ -277,7 +277,7 @@ text cta.body x=64 y=480 w=400 h=24
 
 ## `instance` — a copy of a component
 
-Something drawn once and used on many pages — a sidebar, a nav bar, a card — is a
+Something drawn once and used on many pages — a footer, a legend, a border, a sidebar — is a
 **component**: a top-level frame with the bare `component` flag. Put components in a row
 **below the pages**, never on one; Play and every export of the pages leave them out.
 
@@ -341,9 +341,9 @@ connector rule x1=40 y1=500 x2=520 y2=500 stroke=muted dash="4 4"
 ## `group` — structure, and nothing else
 
 ```vd
-group cards
-  rect card.1 x=$gap y=0 w=200 h=120
-  rect card.2 x=(@card.1.right + $gap) y=(prev.y) w=@card.1.w h=120
+group steps
+  rect step.1 x=$gap y=0 w=200 h=120
+  rect step.2 x=(@step.1.right + $gap) y=(prev.y) w=@step.1.w h=120
 ```
 
 A group has **no `x`, `y`, `w` or `h`**: it is transparent to layout. Its children keep
@@ -382,9 +382,9 @@ rect chip x=0 y=0 w=120 h=40 fill=#2563EB radius=$r radiusBL=0
 ```
 
 - A radius too big for its box is drawn as CSS draws it: all four shrink together until
-  they fit. `radius=999` on a button is a pill.
+  they fit. `radius=999` on a short rect is a pill.
 - On a `frame`, `radius` rounds the `background`, the shadow and, with `clip`, what it
-  clips: a card is a frame with `background`, `radius` and `clip`.
+  clips: a rounded photo frame is a frame with `background`, `radius` and `clip`.
 - In a patch, `radius` sets every corner, as CSS's shorthand does: `set card radius=0`
   squares a card whatever its corners said, a part of an instance included, and
   `set card radius="16 16 0 0"` replaces `radius` with four corners. In one statement the
@@ -454,7 +454,7 @@ rect card x=64 y=520 w=320 h=200 radius=16 fill=#FFFFFF shadow=lift
 
 ## Ids
 
-An id is how other nodes refer to one, so make it guessable: `hero.title`,
-`card.1`, `nav.logo`, `footer.legal`. Dots are ordinary characters and read as structure.
+An id is how other nodes refer to one, so make it guessable: `poster.title`,
+`step.1`, `legend.key`, `footer.legal`. Dots are ordinary characters and read as structure.
 
 Ids must be unique across the document.

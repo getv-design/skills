@@ -1,14 +1,19 @@
 {
   "name": "vdesign",
-  "description": "Create and edit vDesign documents — posters, slides, hero sections, card grids — that stay editable and relational instead of being flattened to fixed coordinates.",
+  "displayName": "vDesign",
+  "description": "Create and edit vDesign documents: posters, diagrams, slides, web pages and any other visual design, kept editable and relational instead of flattened to fixed coordinates.",
   "author": {
     "name": "vDesign",
     "email": "teams@getv.design",
     "url": "https://getv.design"
   },
-  "homepage": "https://getv.design/docs",
+  "homepage": "https://getv.design",
+  "documentationUrl": "https://getv.design/docs/",
+  "supportUrl": "https://getv.design",
   "repository": "https://github.com/getv-design/skills",
   "license": "CC-BY-4.0",
   "privacyPolicyUrl": "https://getv.design/privacy",
-  "keywords": ["design", "layout", "slides", "poster", "vdesign"]
+  "termsOfServiceUrl": "https://getv.design/terms",
+  "keywords": ["design", "layout", "slides", "poster", "vdesign"],
+  "icon": "./.claude-plugin/icon.png"
 }

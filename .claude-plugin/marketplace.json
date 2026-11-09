@@ -11,8 +11,9 @@
   "plugins": [
     {
       "name": "vdesign",
+      "displayName": "vDesign",
       "source": "./",
-      "description": "Create and edit vDesign documents — posters, slides, hero sections, card grids — that stay editable and relational instead of being flattened to fixed coordinates.",
+      "description": "Create and edit vDesign documents: posters, diagrams, slides, web pages and any other visual design, kept editable and relational instead of flattened to fixed coordinates.",
       "category": "design",
       "homepage": "https://getv.design/docs"
     }

@@ -1,0 +1,24 @@
+version 4
+kind design
+title "Order flow"
+$gap = 96
+$line = #64748b
+$step = #e0ecff
+
+frame flow w=960 h=400 background=#ffffff
+  ellipse placed x=64 y=96 w=200 h=104 fill=step
+  rect pack x=(@placed.right + $gap) y=(@placed.cy - 44) w=220 h=88 fill=step
+  rect ship x=(@pack.right + $gap) y=@pack.y w=@pack.w h=@pack.h fill=step
+  rect back x=@ship.x y=(@ship.bottom + 72) w=@ship.w h=@ship.h fill=none stroke=line strokeWidth=2 dash="6 6"
+  text placed.label x=@placed.x y=@placed.y w=@placed.w h=@placed.h size=22 align=center valign=middle
+    "Placed"
+  text pack.label x=@pack.x y=@pack.y w=@pack.w h=@pack.h size=22 align=center valign=middle
+    "Packed"
+  text ship.label x=@ship.x y=@ship.y w=@ship.w h=@ship.h size=22 align=center valign=middle
+    "Shipped"
+  text back.label x=@back.x y=@back.y w=@back.w h=@back.h size=22 align=center valign=middle fill=line
+    "Returned"
+  connector a1 x1=@placed.right y1=@placed.cy x2=@pack.left y2=@pack.cy stroke=line end=arrow
+  connector a2 x1=@pack.right y1=@pack.cy x2=@ship.left y2=@ship.cy stroke=line end=arrow
+  connector a3 x1=@ship.cx y1=@ship.bottom x2=@back.cx y2=@back.top stroke=line end=arrow
+  connector a4 x1=@back.left y1=@back.cy x2=@pack.cx y2=@pack.bottom stroke=line route=elbow end=arrow

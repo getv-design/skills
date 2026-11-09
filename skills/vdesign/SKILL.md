@@ -1,6 +1,6 @@
 ---
 name: vdesign
-description: Author and edit vDesign documents — posters, slides, hero sections, card grids, any laid-out visual document — in the .vd DSL. Use when asked to create, change, or read a vDesign document, a .vd file, or when a task involves designing a layout that should stay editable and relational rather than being flattened to fixed coordinates.
+description: Author and edit vDesign documents (posters, diagrams, slides, illustrations, social posts, web pages, any visual document) in the .vd DSL. Use when asked to create, change, or read a vDesign document, a .vd file, or when a task involves designing a layout that should stay editable and relational rather than being flattened to fixed coordinates.
 license: CC-BY-4.0 (https://creativecommons.org/licenses/by/4.0/). Credit vDesign.
 ---
 
@@ -15,6 +15,11 @@ That is the entire point of the format, and it is what you are being asked for. 
 full of literal coordinates is a worse version of a Figma file. A document of expressions
 and tokens can be edited by changing one number.
 
+## No house style
+
+vDesign draws anything. Design for the medium asked for: a poster is not a web page, so no
+cards, nav bars, buttons or rounded panels unless the person asks.
+
 ## The output contract
 
 Emit **only DSL lines**. No prose before or after, no explanation, no JSON. A fenced block
@@ -25,22 +30,22 @@ is tolerated but unnecessary.
 ```vd
 version 4
 kind design
-title "Launch hero"
-$gap = 24
-$accent = #5b5bd6
-$paper = #ffffff
-$highlight = #ffd166
+title "Jazz night poster"
+$m = 72
+$paper = #f2e8d5
+$accent = #d2462f
+$ink = #1d1a16
 
-font display = Inter
-  fallback "system-ui, sans-serif"
+font display = Georgia
+  fallback "serif"
 
-frame page w=1280 h=720 background=paper
-  rect hero.bg x=$gap y=24 w=(100% - $gap * 2) h=260 fill=accent radius=16
-  text hero.title x=(@hero.bg.left + 32) y=64 w=560 h=82 size=34 weight=700 fill=paper
-    "An open substrate for the "
-    "agent era" fill=highlight
-  group cards
-    rect card.1 x=$gap y=(@hero.bg.bottom + $gap) w=((100% - $gap * 4) / 3) h=200
+frame poster w=1080 h=1350 background=paper
+  ellipse sun x=(parent.cx - self.w / 2) y=150 w=560 h=560 fill=accent
+  text poster.title x=$m y=(@sun.bottom + 56) w=(100% - $m * 2) h=210 font=display size=168 fill=ink
+    "Blue "
+    "Room" italic fill=accent
+  group stars
+    ellipse star.1 x=$m y=$m w=24 h=24 fill=ink
 ```
 
 - **The first lines are the header.** `version 4` and `kind design`. Write both. `design`
@@ -51,7 +56,7 @@ frame page w=1280 h=720 background=paper
   first (`vd_read_brand`), name its roles in paint (`fill=primary`, `background=background`)
   and never write a colour out, and never write the brand line yourself: `vd_apply_brand` does.
 - **Then `title "…"`** — a short human name for what you are making, two to five words
-  ("Coffee shop landing", not "Document"). It is what the tab shows, so write it before the
+  ("Jazz night poster", not "Document"). It is what the tab shows, so write it before the
   first page: the name should appear while the design is still arriving.
 - **Two spaces of indent is one level.** Indentation is the only nesting.
 - A line is `<type> <id> key=value key=value …`.
@@ -75,8 +80,8 @@ always a literal, which is how you write a string that starts with a sigil: `fil
 document and a screenshot. Before writing a number, ask what it is derived from.
 
 ```text
-✗ rect card.2 x=148 y=308 w=395 h=200
-✓ rect card.2 x=(@card.1.right + $gap) y=(prev.y) w=@card.1.w h=200
+✗ rect step.2 x=416 y=180 w=220 h=88
+✓ rect step.2 x=(@step.1.right + $gap) y=(prev.y) w=@step.1.w h=88
 ```
 
 **2. Put every repeated value in a token first.** A colour used twice, a spacing used
@@ -87,7 +92,7 @@ is also the edit surface: "make it roomier" becomes one line.
 document, and a consumer may be rendering your output as it streams. Write `logo` before
 the headline that sits beside it.
 
-**4. Give ids a role, not a number.** `hero.title`, `card.1`, `nav.logo` — an id should be
+**4. Give ids a role, not a number.** `poster.title`, `step.1`, `legend.key`: an id should be
 guessable by someone who has not read the file. Never `node1`, `rect5`.
 
 **5. Text height is authored — estimate it.** Nothing measures glyphs for you. For a box
@@ -113,52 +118,41 @@ document with a frame; you do not write a `canvas` line at all. Each frame is it
 coordinate space, so `x=$gap` means `$gap` from _that page's_ left edge and `100%` means
 that page's width. `parent.cx` is that page's centre too, and `parent.left` is `0`, so the
 same line centres something on every page. Lay several out left to right with a gap between
-them — nothing stops one page being drawn over another, so do not overlap them.
+them: nothing stops one page being drawn over another.
 
-```vd
-$gap = 24
-
-frame page w=1280 h=720 background=paper
-  rect hero.bg x=$gap y=$gap w=(100% - $gap * 2) h=320 fill=accent
-
-frame pricing x=1380 w=1280 h=720 background=paper
-  text pricing.title x=$gap y=$gap w=600 h=48 size=34 weight=700
-    "Pricing"
-```
-
-**9. Centre a label by giving it the box it sits in, never an offset.** A button's label,
-a badge's number, a chip's text: same `x y w h` as the shape behind it, then
+**9. Centre a label by giving it the box it sits in, never an offset.** A diagram step's
+name, a badge's number, a stamp's text: same `x y w h` as the shape behind it, then
 `align=center valign=middle`. The renderer centres the line inside the box, so it stays
-centred at any size or font. A guessed `y=(@cta.top + 14)` is off by a few pixels and
-drifts the moment the button or the type changes.
+centred at any size or font. A guessed `y=(@step.1.top + 14)` is off by a few pixels and
+drifts the moment the shape or the type changes.
 
 ```vd
-rect cta x=$gap y=400 w=180 h=48 fill=accent radius=10
-text cta.label x=@cta.x y=@cta.y w=@cta.w h=@cta.h align=center valign=middle fill=paper
-  "Get started"
+ellipse step.1 x=$gap y=400 w=200 h=104 fill=accent
+text step.1.label x=@step.1.x y=@step.1.y w=@step.1.w h=@step.1.h align=center valign=middle
+  "Placed"
 ```
 
-**10. Draw a repeated part once, as a component.** A sidebar, nav bar or card that appears on
-several pages is a frame marked `component`, in a row below the pages, and each page places
-an `instance` of it. What one page shows differently — its selected menu item, its own
-title — is an `override` line under that instance, never a copy of the parts:
+**10. Draw a repeated part once, as a component.** A footer, frame border or legend that
+appears on several pages is a frame marked `component`, in a row below the pages, and each
+page places an `instance` of it. What one page shows differently is an `override` line under
+that instance, never a copy of the parts:
 
 ```vd
-frame nav x=0 y=900 w=1280 h=64 background=surface component
-  text nav.title x=$gap y=0 w=400 h=64 valign=middle
-    "Overview"
+frame foot x=0 y=1000 w=1600 h=64 component
+  text foot.title x=$gap y=0 w=400 h=64 valign=middle
+    "Q3 review"
 
-frame home x=0 y=0 w=1280 h=720
-  instance home.nav component=nav x=0 y=0
+frame intro x=0 y=0 w=1600 h=900
+  instance intro.foot component=foot x=0 y=(100% - 64)
 
-frame pricing x=1380 y=0 w=1280 h=720
-  instance pricing.nav component=nav x=0 y=0
-    override nav.title
-      "Pricing"
+frame plan x=1700 y=0 w=1600 h=900
+  instance plan.foot component=foot x=0 y=(100% - 64)
+    override foot.title
+      "Plan"
 ```
 
 `reference/nodes.md` has the rest: a part's page id is the instance's id and its own
-(`pricing.nav.nav.title`), and references inside a component are written unprefixed.
+(`plan.foot.foot.title`), and references inside a component are written unprefixed.
 
 ## Editing an existing document
 
@@ -167,15 +161,15 @@ document. Five verbs, plus `title` to rename the document and `merge` to make on
 several:
 
 ```vd-patch
-title "Pricing page"
+title "Jazz night poster"
 set $gap = 40
-set hero.title size=($display * 1.2) weight=800
-set hero.sub content="A shorter subhead."
-unset hero.sub opacity
-insert rect card.4 after card.3 x=(@card.3.right + $gap) y=(prev.y) w=@card.1.w h=200
-insert frame pricing x=(@page.right + 100) w=@page.w h=@page.h background=paper
-move logo before hero.bg
-delete hero.tagline
+set poster.title size=($display * 1.2) weight=800
+set poster.when content="SATURDAY · 9PM"
+unset poster.where opacity
+insert rect step.4 after step.3 x=(@step.3.right + $gap) y=(prev.y) w=@step.1.w h=88
+insert frame back x=(@poster.right + 100) w=@poster.w h=@poster.h background=paper
+move logo before sun
+delete poster.tagline
 merge union badge.ring badge.dot as badge.mark
 ```
 
@@ -196,9 +190,9 @@ another node references.
 
 Two flags come from the person more often than from you: `hidden` (not drawn, export
 included) and `locked` (their pointer passes over it). Keep them as you find them. Hide with
-`set card.2 hidden` only when asked to hide — when asked to remove something, `delete` it,
+`set step.2 hidden` only when asked to hide — when asked to remove something, `delete` it,
 because a hidden node is still in the file for the next reader to wade through. `unset
-card.2 hidden` shows it again.
+step.2 hidden` shows it again.
 
 A top-level frame is a slide when the document is played. For a backup or reference slide
 that should stay in the deck but out of the talk, write `skip` on its frame (`set appendix
@@ -208,7 +202,7 @@ delete it.
 ## Motion and video
 
 How a page moves in time is a `motion` section after the last page: transitions between
-slides, parts of a page appearing in order, buttons that go to another page — and, for a
+slides, parts of a page appearing in order, links to another page and, for a
 video, words entering one by one, numbers counting up, strokes drawing on and a camera moving
 across the page. The canvas at rest and every still export show each page as written, so write
 the page as it looks when finished and let motion say how it gets there.
@@ -217,7 +211,7 @@ the page as it looks when finished and let motion say how it gets there.
 motion intro enter=fade
   intro.title enter=rise by=word
   intro.chart enter=fade step
-  intro.cta enter=pop go=#pricing
+  intro.next enter=pop go=#plan
 ```
 
 Add it when the person is making something to present, click through or post as a video, and
@@ -235,7 +229,7 @@ Icons come from the Lucide set, about 1,900 line icons, by name.
 - **Over MCP**, find one with `vd_search_icon` (`"settings"`, `"notification"`) and place it
   with `vd_add_icon`, which writes the `vector` for you — the icon's path, Lucide's stroke,
   round caps. Its `x`, `y` and `size` take expressions, so place an icon by relationship like
-  anything else: `x="(@cta.right - 32)"`.
+  anything else: `x="(@step.1.right - 32)"`.
 - **In the app**, find one with `search_icons` and get its line with `use_icon`, before you
   write any DSL; copy that `vector` line into your reply as it comes back.
 - **Where no icon tool is offered**, draw it as a `vector` (`reference/nodes.md`).
@@ -247,7 +241,7 @@ A placed icon is an ordinary vector named `lucide:<name>`. Recolour it with
 
 ## Images
 
-A picture is an `image` node that names an asset: `image hero.logo x=40 y=32 w=160 h=48
+A picture is an `image` node that names an asset: `image poster.logo x=40 y=32 w=160 h=48
 src=logo fit=contain`. The asset's registry line (`asset logo = image/png hash=…`) and its
 bytes are **never yours to write** — hashes come from the app. You only ever write `src=`.
 
@@ -263,7 +257,7 @@ bytes are **never yours to write** — hashes come from the app. You only ever w
   saying what goes there:
 
   ```vd
-  image nav.logo x=40 y=24 w=120 h=40 src=logo fit=contain name="Your logo"
+  image poster.logo x=40 y=24 w=120 h=40 src=logo fit=contain name="Your logo"
   ```
 
   The canvas shows it as a labelled box the person drops the file into, whenever they like.
@@ -277,7 +271,7 @@ deleting the image; do fix a `src` you simply misspelled.
 ## Looking at your work, and exporting
 
 **Over MCP (desktop and CLI), `vd_export` is how you see what you made.** `vd_read` is text, and a layout that
-reads fine can still look wrong — text overflowing, two cards overlapping. After a build or
+reads fine can still look wrong: text overflowing, two shapes overlapping. After a build or
 a large edit, export the frame as `png` with `save: false` and look at the picture that comes
 back; fix what you see, then look again.
 
@@ -298,8 +292,8 @@ way to show them: a picture from anything but vDesign is not what the design loo
 
 ## Reference
 
-Each file is named by its path in this skill. Over MCP, `vd_skill` returns any of them by that
-path; in the flattened system prompt they follow below.
+Each file is named by its path in this skill. Installed as a folder, read them from beside
+this file, never through `vd_skill`; in the flattened system prompt they follow below.
 
 - `reference/grammar.md` — the expression language in full: edges, percentages, relative
   references, precedence; plus tokens, paint (colours, gradients, layers), fonts and the asset
@@ -314,5 +308,5 @@ path; in the flattened system prompt they follow below.
   cutting to the beat.
 - `reference/brand.md` — brands: a `kind brand` document's roles, logos, rules and guides, how
   a patch changes one, how one is made, and how a design uses one.
-- `examples/` — complete documents: `hero.vd`, `cards.vd`, `slide.vd`, `deck.vd` (three pages
-  with motion), and `promo.vd`, a 9-second video storyboard.
+- `examples/`: complete documents. `diagram.vd`, `slide.vd`, `hero.vd` (a web page),
+  `deck.vd` (three pages with motion), and `promo.vd`, a 9-second video storyboard.

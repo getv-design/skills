@@ -10,16 +10,16 @@ Statements are never indented, except for the body of an `insert`.
 
 ```vd-patch
 set $gap = 40                              a token
-set hero.title size=34 weight=700          one or more properties
-set card.2 w=(@card.1.w * 2)               an expression, same rules as anywhere
+set poster.title size=34 weight=700          one or more properties
+set step.2 w=(@step.1.w * 2)               an expression, same rules as anywhere
 ```
 
-`radius` is CSS's shorthand here as in CSS: writing it sets every corner, so `set card
-radius=0` squares a card with corners of its own, and `set card radius="16 16 0 0"` gives it
-four. `set card radiusTL=0` changes one corner and leaves the rest. When one statement
-writes both, the later wins: `set card radius=8 radiusTL=0` rounds three corners.
+`radius` is CSS's shorthand here as in CSS: writing it sets every corner, so `set badge
+radius=0` squares a badge with corners of its own, and `set badge radius="16 16 0 0"` gives it
+four. `set badge radiusTL=0` changes one corner and leaves the rest. When one statement
+writes both, the later wins: `set badge radius=8 radiusTL=0` rounds three corners.
 
-**Reach for the token first.** If four cards are laid out with `$gap`, "more breathing
+**Reach for the token first.** If four steps are laid out with `$gap`, "more breathing
 room" is `set $gap = 40` — one line, and the relationships survive. Writing four `set`
 statements with new coordinates destroys exactly what the document was for.
 
@@ -28,11 +28,11 @@ statements with new coordinates destroys exactly what the document was for.
 `content` is the one thing a node line does not carry, so `set` reaches it two ways:
 
 ```vd-patch
-set hero.title content="A new headline"
+set poster.title content="A new headline"
 ```
 
 ```vd-patch
-set hero.title
+set poster.title
   "Open tooling for the "
   "agent era" fill=highlight
 ```
@@ -61,23 +61,23 @@ put them in a group and move that).
 Removes a property so its default comes back.
 
 ```vd-patch
-unset hero.sub opacity
-unset card.1 stroke strokeWidth dash strokeAlign
+unset poster.sub opacity
+unset step.1 stroke strokeWidth dash strokeAlign
 unset avatar.photo mask
 ```
 
 For a token, use `delete $name` — a token is a thing, not a property.
 
-`unset card radius` takes away `radius` only: a corner written on its own (`radiusTL` and
-the rest) stays. `set card radius=0` squares every corner, and `unset card radiusTL
+`unset badge radius` takes away `radius` only: a corner written on its own (`radiusTL` and
+the rest) stays. `set badge radius=0` squares every corner, and `unset badge radiusTL
 radiusTR radiusBR radiusBL` hands every corner back to `radius`.
 
 ## `insert`
 
 ```vd-patch
-insert rect card.4 after card.3 x=(@card.3.right + $gap) y=(prev.y) w=@card.1.w h=200
+insert rect step.4 after step.3 x=(@step.3.right + $gap) y=(prev.y) w=@step.1.w h=200
 insert text caption before footer x=$gap y=0 w=400 h=20
-insert group cards in page
+insert group steps in page
   rect inner x=0 y=0 w=10 h=10
   text label x=0 y=12 w=40 h=10
     "A caption"
@@ -100,14 +100,14 @@ Children and text runs go indented underneath, exactly as in a document.
 Takes the same placements.
 
 ```vd-patch
-move logo before hero.bg
-move card.3 in cards at 0
+move logo before band
+move step.3 in steps at 0
 ```
 
 ## `delete`
 
 ```vd-patch
-delete hero.tagline
+delete poster.tagline
 delete $unused
 ```
 
@@ -125,7 +125,7 @@ delete review role.muted
 Renames the document. It is the same line a whole document opens with.
 
 ```vd-patch
-title "Pricing page"
+title "Jazz night poster"
 ```
 
 ## `motion`
@@ -173,7 +173,7 @@ do in a design tool. Name the verb, then the shapes, in any order; `as` names th
 
 ```vd-patch
 merge union badge.ring badge.dot as badge.mark
-merge subtract card.bg card.notch
+merge subtract ticket.bg ticket.notch
 merge intersect lens.left lens.right as lens
 merge exclude ring.outer ring.inner
 ```
@@ -218,7 +218,7 @@ no `rotation`. Rotation and corners are baked into the path; arcs stay curves.
 **Statements apply in order, against a document that grows as they do.** So this works:
 
 ```vd-patch
-insert rect a after card.2 x=0 y=0 w=10 h=10
+insert rect a after step.2 x=0 y=0 w=10 h=10
 insert rect b after a x=0 y=0 w=10 h=10
 ```
 
@@ -226,12 +226,12 @@ insert rect b after a x=0 y=0 w=10 h=10
 back naming the line. Fix that line; do not resend the whole patch.
 
 **Deleting leaves dangling references.** Nothing rewrites expressions for you, so removing
-`logo` while `hero.title` reads `x=(@logo.right + $gap)` produces an `unknown-reference`
+`logo` while `poster.title` reads `x=(@logo.right + $gap)` produces an `unknown-reference`
 error on the next read. Before deleting, check what points at it, and either repoint those
 first or delete them too:
 
 ```vd-patch
-set hero.title x=$gap
+set poster.title x=$gap
 delete logo
 ```
 
