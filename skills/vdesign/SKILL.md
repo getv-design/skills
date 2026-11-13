@@ -48,9 +48,10 @@ frame poster w=1080 h=1350 background=paper
     ellipse star.1 x=$m y=$m w=24 h=24 fill=ink
 ```
 
-- **The first lines are the header.** `version 4` and `kind design`. Write both. `design`
-  is the free-form canvas; a document that does not say which it is leaves every reader to
-  guess from its contents. The one other kind is a brand, `version 5` and `kind brand`, which
+- **The first lines are the header.** `version 4` and `kind design`. Write both, first.
+  Choose the kind yourself and never ask: a deck, presentation, slides or pitch is
+  `version 12` and `kind slides`; anything else, or when unsure, `kind design`, the
+  free-form canvas. The one other kind is a brand, `version 5` and `kind brand`, which
   `reference/brand.md` covers — make one only when asked for a brand.
 - **A design in a brand** has a `brand ember@3` line under its title. Read the brand's brief
   first (`vd_read_brand`), name its roles in paint (`fill=primary`, `background=background`)
@@ -60,7 +61,8 @@ frame poster w=1080 h=1350 background=paper
   first page: the name should appear while the design is still arriving.
 - **Two spaces of indent is one level.** Indentation is the only nesting.
 - A line is `<type> <id> key=value key=value …`.
-- A **quoted line** under a `text` node is one run of its content.
+- A **quoted line** under a `text` node is one run of its content. A list is `para bullet "…"`
+  lines, one per item, never a typed `•` or `1.` (`reference/nodes.md`).
 - A **boolean is a bare flag**: `italic`, never `italic=true`.
 - **There are no comments.** `#` already starts a colour. Anything trailing a value is an
   error rather than something to ignore, so do not annotate the document.
@@ -132,9 +134,9 @@ text step.1.label x=@step.1.x y=@step.1.y w=@step.1.w h=@step.1.h align=center v
   "Placed"
 ```
 
-**10. Draw a repeated part once, as a component.** A footer, frame border or legend that
-appears on several pages is a frame marked `component`, in a row below the pages, and each
-page places an `instance` of it. What one page shows differently is an `override` line under
+**10. Draw a repeated part once, as a component.** In a design, a footer, frame border or
+legend that appears on several pages is a frame marked `component`, in a row below the
+pages, and each page places an `instance` of it. What one page shows differently is an `override` line under
 that instance, never a copy of the parts:
 
 ```vd
@@ -154,11 +156,28 @@ frame plan x=1700 y=0 w=1600 h=900
 `reference/nodes.md` has the rest: a part's page id is the instance's id and its own
 (`plan.foot.foot.title`), and references inside a component are written unprefixed.
 
+**A deck (`kind slides`) is its top-level frames**, in order, one size, nothing outside
+them; a component is not a slide. **In a deck every component is a whole slide**: the
+master or a layout, the slides' own size. Never a strip, card, badge or footer on its own:
+the footer and page number go on the master, a card repeated on one slide is drawn on that
+slide (a `table`, or nested frames bound to the first), and a part on many slides belongs
+to their layout. **Its slides are pages on layouts** (`frame s3
+layout=columns`): the title, the content boxes and the master go on the layout once, and
+each slide words its title with `override title` and fills each box with a `slot` block
+(`reference/nodes.md`, `examples/layouts.vd`). Any deck of three slides or more: a master (footer, page number as
+`field=number`, never typed digits), a layout per kind of slide, every slide on one. Name
+slots `title`, `subtitle`, `body`, `left`, `right`, `picture`: PowerPoint gets real
+placeholders and layouts it can switch between.
+
+**11. Numbers are a `chart`, and a grid of words a `table`**, never rects you measured:
+write the data and the cells (`reference/nodes.md`, `examples/layouts.vd`).
+
 ## Editing an existing document
 
 When given a document and asked to change it, reply with **statements**, not a new
-document. Five verbs, plus `title` to rename the document and `merge` to make one shape of
-several:
+document. Five verbs, plus `title` to rename the document, `kind slides` or `kind design`
+to make it a deck or not, `notes <page>` for a slide's speaker notes
+(`reference/edits.md`), and `merge` to make one shape of several:
 
 ```vd-patch
 title "Jazz night poster"
@@ -309,4 +328,5 @@ this file, never through `vd_skill`; in the flattened system prompt they follow 
 - `reference/brand.md` — brands: a `kind brand` document's roles, logos, rules and guides, how
   a patch changes one, how one is made, and how a design uses one.
 - `examples/`: complete documents. `diagram.vd`, `slide.vd`, `hero.vd` (a web page),
-  `deck.vd` (three pages with motion), and `promo.vd`, a 9-second video storyboard.
+  `deck.vd` (three slides on layouts, with motion), `layouts.vd` (a deck on layouts, with a list, a chart
+  and a table), and `promo.vd`, a 9-second video storyboard.

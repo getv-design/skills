@@ -1,0 +1,96 @@
+version 12
+kind slides
+title "Quarterly review"
+$ink = #101014
+$paper = #fafafa
+$muted = #6b6b76
+$primary = #2557d6
+$gap = 64
+
+frame master x=0 y=1000 w=1280 h=720 background=paper component
+  rect master.band x=0 y=(100% - 8) w=(100%) h=8 fill=primary
+  text master.footer x=$gap y=(100% - 56) w=480 h=24 size=16 fill=muted
+    "Acme · Quarterly review"
+  text master.number x=(100% - $gap - 120) y=(100% - 56) w=120 h=24 size=16 align=right fill=muted
+    "1" field=number
+
+frame cover x=1380 y=1000 w=1280 h=720 name=Cover background=ink component
+  text cover.title x=$gap y=240 w=(100% - $gap * 2) h=116 size=88 weight=800 fill=paper slot hint=Title
+    "Deck title"
+  text cover.subtitle x=$gap y=(@cover.title.bottom + 24) w=(100% - $gap * 2) h=40 size=32 fill=paper opacity=0.7 slot hint=Subtitle
+    "Subtitle"
+
+frame content x=2760 y=1000 w=1280 h=720 name="Title and content" component
+  instance content.chrome component=master x=0 y=0
+  text content.title x=$gap y=56 w=(100% - $gap * 2) h=58 size=48 weight=800 fill=ink slot hint=Title
+    "Slide title"
+  frame content.body x=$gap y=160 w=(100% - $gap * 2) h=(100% - 260) slot hint="Text or chart"
+
+frame columns x=4140 y=1000 w=1280 h=720 name="Two columns" component
+  instance columns.chrome component=master x=0 y=0
+  text columns.title x=$gap y=56 w=(100% - $gap * 2) h=58 size=48 weight=800 fill=ink slot hint=Title
+    "Slide title"
+  frame columns.left x=$gap y=160 w=((100% - $gap * 3) / 2) h=(100% - 260) slot hint=Left
+  frame columns.right x=(@columns.left.right + $gap) y=@columns.left.y w=@columns.left.w h=@columns.left.h slot hint=Right
+
+frame s1 x=0 y=0 layout=cover
+  override title
+    "Q3 review"
+  override subtitle
+    "Revenue, churn and what ships next"
+
+frame s2 x=1380 y=0 layout=content
+  override title
+    "Where we are"
+  slot body
+    text s2.points x=0 y=0 w=(100%) h=(100%) size=32 fill=ink
+      para bullet after=16 "Revenue up 24% on Q2, the best quarter since launch."
+      para bullet level=2 after=16 "Teams accounts brought 40% of it."
+      para bullet after=16 "Churn held at 2%."
+      para bullet "Teams plan ships in October."
+
+frame s3 x=2760 y=0 layout=columns
+  override title
+    "Revenue by quarter"
+  slot left
+    chart s3.rev x=0 y=0 w=(100%) h=(100%) labels=Q1,Q2,Q3 format="$#,##0.0M" grid
+      series s3.rev.y name="2026" values=1.6,2.1,2.6 fill=primary
+  slot right
+    text s3.why x=0 y=0 w=(100%) h=(100%) size=28 fill=ink
+      "Teams accounts brought most of the growth: 40% of new revenue from three in five new logos."
+
+frame s4 x=4140 y=0 layout=content
+  override title
+    "Plans from October"
+  slot body
+    table s4.plans x=0 y=0 w=(100%) h=(100%) cols=2,1,1 header band headerFill=primary headerText=#FFFFFF bandFill=#EEF2FB lines=rows stroke=#D5DAE3 size=24 padding="12 20" valign=middle
+      row s4.plans.head
+        cell "Plan"
+        cell "Seats"
+        cell "Price" align=right
+      row s4.plans.solo
+        cell "Solo"
+        cell "1"
+        cell "$12 /mo" align=right
+      row s4.plans.team
+        cell "Teams"
+        cell "Up to 50"
+        cell align=right
+          "$199" weight=700
+          " /mo"
+      row s4.plans.org
+        cell "Enterprise"
+        cell "Unlimited"
+        cell "Talk to us" align=right
+      row s4.plans.note
+        cell "Prices exclude VAT. Teams replaces the Studio plan." colspan=3 italic size=18 fill=paper
+
+frame s5 x=5520 y=0 layout=cover
+  override title
+    "Questions?"
+  override subtitle
+    "sam@acme.example"
+
+notes s2
+  "Lead with the 24%: it is the number people will repeat."
+  "Churn is flat, not falling. Say so before anyone asks."

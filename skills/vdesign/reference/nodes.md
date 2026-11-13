@@ -1,6 +1,6 @@
 # Node types
 
-Eleven. Every line is `<type> <id> key=value …`, and children are indented two spaces under
+Thirteen. Every line is `<type> <id> key=value …`, and children are indented two spaces under
 their container.
 
 Every node also accepts `name="…"`, a human label with no effect on layout.
@@ -28,6 +28,9 @@ A document holds as many as you like: pages, slides or artboards. Frames nest, a
 | `clip`       | flag                 | hide what overflows; off by default  |
 | `skip`       | flag                 | left out of Play; top-level only     |
 | `component`  | flag                 | other pages place copies of it       |
+| `layout`     | component id         | the slide layout this page is on     |
+| `slot`       | flag                 | in a layout: a part each page fills  |
+| `hint`       | text                 | what an empty slot asks for          |
 
 ```vd
 $gap = 24
@@ -233,6 +236,7 @@ video hero.reel x=0 y=0 w=(100%) h=540 src=reel fit=cover start=2000 end=8000 po
 | `italic`           | bare flag                         | off                                        |
 | `fill`             | token or colour                   | `#0F172A`                                  |
 | `opacity`          | number or expression              | 1                                          |
+| `slot`, `hint`     | flag, text                        | in a layout: words each page gives         |
 
 **`h` is authored.** Nothing measures the glyphs for you, and text that does not fit is
 drawn overflowing and reported as `text-overflow`. Estimate:
@@ -258,8 +262,12 @@ formatting actually changes — and mind the spaces, which belong to whichever r
 follow.
 
 A run may carry `font`, `size`, `weight`, `italic`, `underline`, `strike`, `fill`,
-`letterSpacing`, `link`. All literals: a run is not addressable, so nothing there can be an
-expression.
+`letterSpacing`, `link`, `field`. All literals: a run is not addressable, so nothing there can
+be an expression.
+
+`field=number` draws the page's number in place of the run's words, `field=count` how many
+pages there are; `field=date` keeps the words written, and a PowerPoint export makes it a date
+that updates. Put them in a layout's footer: `"Page "`, `"1" field=number`.
 
 `link` makes the run a link: `link="https://…"`, `link="mailto:…"`, or `link="#pricing"` to
 jump to the frame `pricing` in the same document. Nothing else is followed — `http:`,
@@ -275,11 +283,37 @@ text cta.body x=64 y=480 w=400 h=24
   "pricing" link="#pricing" underline
 ```
 
+### Paragraphs: lists, levels, spacing
+
+A `para` line opens a paragraph: its properties, then its words. Wrapped lines of a list item
+line up under its words. Never type `•`, `1.` or leading spaces into the words.
+
+```vd
+text s2.points x=64 y=160 w=640 h=300 size=28
+  para bullet "Revenue up 24% on Q2"
+  para bullet level=2 marker=– "Teams accounts brought 40% of it"
+  para number marker="a)" "First step"
+  para number "Second step"
+  para before=16 align=right "A plain paragraph"
+```
+
+`bullet` or `number` makes a list item, counted per `level` (1–9, each further in);
+`marker` is a bullet's glyph or a number's pattern (`1.` `1)` `(1)` `a.` `A)` `i.` `I.`),
+`start` the first number. A marker is drawn as its words are; `markerFill=primary` gives it
+its own colour and `markerScale=0.8` its own size, as a multiple of the words'. `align` and `lineHeight` are the paragraph's own; `before` and
+`after` are px of space around it. `indent` and `hang` (px: where its lines start, how far
+the first hangs left) are rarely needed. Several runs go on lines indented under the `para`.
+Once a body has `para` lines every paragraph is one (`para "Words"` for a plain one).
+
 ## `instance` — a copy of a component
 
 Something drawn once and used on many pages — a footer, a legend, a border, a sidebar — is a
 **component**: a top-level frame with the bare `component` flag. Put components in a row
 **below the pages**, never on one; Play and every export of the pages leave them out.
+
+In a deck (`kind slides`) a component is only ever a whole slide, the master or a layout
+(below), at the slides' size. A footer or a card is never a component of its own there: it
+goes on the master, on a layout, or on the slide it is drawn on.
 
 An **instance** places it. Its contents are the component's and are never written under it;
 what it changes is said with `override` lines, each naming a part by its id **in the
@@ -321,6 +355,61 @@ frame billing x=1540 y=0 w=1440 h=900
   property it names. Never copy a component's parts onto a page to vary them — override, or
   make a second component.
 
+### Slide layouts: `layout=` and `slot`
+
+For a deck, give each kind of slide a **layout**: a component holding the title, the boxes
+content goes in, and the master (logo, footer) as an instance. A page names it with
+`layout=` and leaves out `w` and `h`: it is the layout's size, draws its background, and
+gets every part of it. Name a layout's parts with the layout's id first, as a page's nodes
+start with the page's; on the page they lose it (`columns.title` is `s3.title`), so a
+page keeps its words when it moves to another layout. A layout's id is letters, digits and
+`_`, never `-`: its parts point at each other (`@columns.left.right`), and a reference stops at
+a `-`.
+
+A part marked **`slot`** is one each page fills; `hint=` says with what. A text slot's words
+in the layout are a sample, drawn on no page that has not said its own with `override`. A
+slot that is a frame takes nodes in a `slot` block, and `100%` inside them is the slot's box:
+
+```vd
+frame columns x=0 y=1000 w=1280 h=720 background=surface component
+  instance columns.chrome component=master x=0 y=0
+  text columns.title x=64 y=56 w=(100% - 128) h=72 size=$h1 weight=700 slot hint=Title
+    "Slide title"
+  frame columns.left x=64 y=160 w=560 h=(100% - 240) slot hint="Text or chart"
+  frame columns.right x=(@columns.left.right + 32) y=@columns.left.y w=@columns.left.w h=@columns.left.h slot
+
+frame s3 x=0 y=0 layout=columns
+  override title
+    "Revenue vs churn"
+  slot left
+    chart s3.rev x=0 y=0 w=(100%) h=(100%) kind=column labels=Q1,Q2
+      series s3.rev.a values=12,18
+  slot right
+    text s3.notes x=0 y=0 w=(100%) h=(100%)
+      "Revenue up 24% on Q2"
+```
+
+- **Name parts by role** — `title`, `subtitle`, `body`, `left`, `right`, `picture`,
+  `footer`, `number`, `date` — so PowerPoint gets real placeholders and pages carry over.
+- **Nodes after the slot blocks** are the page's own, drawn above the layout.
+- **`set s3 layout=content`** moves a page: overrides and slots carry by id, a slot
+  with no match goes to the first empty one, and anything left stays on the page.
+- **Never copy a layout's parts onto a page**; a slide that needs a different shape needs
+  another layout.
+
+### Speaker notes: `notes`
+
+What the presenter says goes after the pages, never on them: `notes <page id>`, then a quoted
+line per paragraph. Nothing draws it; PowerPoint export makes it the slide's notes.
+
+```vd
+frame s2 x=0 y=0 w=1280 h=720
+
+notes s2
+  "Lead with the 24%: it is the number people will repeat."
+  "Churn is flat, not falling."
+```
+
 ## `connector` — a line, or an arrow joining nodes
 
 Placed by its ends, `x1`, `y1`, `x2`, `y2`, not a box. An end written as a reference
@@ -337,6 +426,116 @@ connector rule x1=40 y1=500 x2=520 y2=500 stroke=muted dash="4 4"
   `blend`, `shadow`, `blur`.
 - Its box is its ends' bounds, so a label is a `text` centred on `@flow.a2b.cx`.
 - An end on a group or on another page is a warning.
+
+## `chart` — numbers, drawn
+
+Write the data and the runtime draws the bars, ticks and key; never draw a chart as rects.
+It holds only `series` lines.
+
+```vd
+chart rev x=40 y=200 w=720 h=400 kind=column labels=Q1,Q2,Q3 format="$#,##0" grid
+  series rev.a name="2025" values=12000,18000,24500 fill=muted
+  series rev.b name="2026" values=15000,,40000 fill=accent
+```
+
+- `x`, `y`, `w`, `h`: the whole chart, key included. `kind`: `column` (default), `bar`,
+  `line`, `area`, `pie`, `doughnut`, `scatter`, `km`; a pie draws its first series.
+- `labels`: one per value, commas and no spaces; quote one with a space or comma:
+  `labels="North America",Europe`.
+- Bare flags: `stacked`, `percent` (stacked to 100%), `grid`, `numbers` (each value
+  written on), `smooth` and `markers` (lines).
+- `legend`: `none` `top` `bottom` `left` `right`, shown unasked for several series or a pie.
+  `axis=none` hides the value axis.
+- `format`: a spreadsheet code, `0.0`, `"$#,##0"`, `0%`, `#,##0,"k"`. Values are plain
+  numbers: `0.12` with `format=0%`, never `12%`.
+- `min`, `max`: the value axis' ends, else from the data with 0. `gap`: between categories,
+  % of a bar (60). `hole`: a doughnut's, % (55). `radius`: bar corners.
+- `scatter`: a dot at each pair, on two number axes fitted to the data (no zero needed).
+  Each series gives `xvalues=` beside `values=`, one per value; no `labels`. `xmin`,
+  `xmax`: the horizontal axis' ends.
+- `km`: a Kaplan–Meier survival curve, 0–100% over time from 0, a + at each censored
+  subject. Raw data, as Prism takes it: each series gives `xvalues=` (each subject's time)
+  and `events=` (1 event, 0 censored), and the curve is worked out. Or a finished curve:
+  `xvalues=` (step times), `values=` (survival in percent, 85 not 0.85) and `censored=`
+  (tick times). Flags: `median` (dashed at 50%), `band` (95% CI) and `risk` (number at
+  risk under the axis) — `band` and `risk` need `events`. `xmin`, `xmax` as a scatter.
+- `font`, `size`, `fill`: its text. `stroke`: axis and grid lines. `opacity`.
+- Exported to PowerPoint it stays a chart, its data editable there; drawn as rects it
+  would be loose shapes.
+
+## `series` — one row of a chart's data
+
+Only in a `chart`: `name` (the key's word), `values` (one per label; an empty entry,
+`12,,24`, is missing and drawn as nothing), `fill`, and `fills` (a colour per value: a
+pie's slices, or `fills=,,,lime` to pick out one bar). In a scatter, `xvalues` place the
+points: `series fit xvalues=152,160,171 values=51,58,70`. In a `km`, `events` or `censored`
+go beside them: `series os.a xvalues=6,6,9,10 events=1,1,0,1`. Change one with
+`set rev.b values=15,22,40`.
+
+## `table` — a grid of text, laid out by the runtime
+
+Write the rows and cells; the runtime works out every column, row and line. Never build
+a table from rects and texts. A table holds only `row`s, a row only `cell`s.
+
+```vd
+table plans x=64 y=160 w=1152 h=240 cols=2,1,1,1 header band headerFill=primary headerText=#FFFFFF bandFill=wash lines=rows
+  row plans.head
+    cell "Plan"
+    cell "Seats"
+    cell "Price" align=right
+    cell "Support"
+  row plans.team
+    cell "Team"
+    cell "50"
+    cell align=right
+      "$199" weight=700
+      " /mo" fill=muted
+    cell "Phone, 24/7" fill=accent
+  row plans.note
+    cell "Prices exclude VAT" colspan=4 italic
+```
+
+- `x`, `y`, `w`, `h`: the box. Rows stack from its top, each as tall as its tallest cell
+  (or its row's `h`); rows that need more than `h` are drawn below it and reported
+  `table-overflow`, so raise `h`.
+- `cols`: each column's share of `w`, as CSS `fr`: `cols=2,1,1`. Absent, equal.
+- Flags: `header` (first row bold, `headerFill`, `headerText`), `band` (`bandFill` on every
+  second body row, the first one first), `firstCol` (first column bold, `firstColFill`).
+- `fill`: the body's background; `text`: the letters' colour. Both take tokens.
+- `lines`: `all` (default), `rows`, `cols`, `outer`, `inner`, `none`, in `stroke` at
+  `strokeWidth` (1).
+- `padding`: inside each cell, one number or `"5 10"` (top/bottom, sides; the default) or
+  `"t r b l"`.
+- Text for every cell: `font`, `size` (16), `weight`, `lineHeight`, `italic`, `align`,
+  `valign`. `opacity`.
+- Exported to PowerPoint it stays a table, typed in and added to there; drawn as rects it
+  would be loose shapes.
+
+## `row` — one row of a table
+
+Only in a `table`, and its id is required. `h`: the least it is drawn. `header` makes it
+a header row too. `fill`, `text`, and the text defaults `font`, `size`, `weight`,
+`lineHeight`, `italic`, `align`, `valign` for its cells. `border`, `borderTop`,
+`borderRight`, `borderBottom` and `borderLeft` are each of its cells' edges (see `cell`):
+`borderBottom="2 ink"` rules a line under the whole row. Add one with
+`insert row plans.ent after plans.team` and its cells indented under it.
+
+## `cell` — one cell of a row
+
+Only in a `row`. Its words are a text node's: one run on the line (`cell "Plan"`), or
+marked runs and `para` lines under it. Its id may be left out: it is then its row's id
+and its column from 1, so `plans.team.3` is the third column of `plans.team`; patch it
+with `set plans.team.3 content="$249"`. `colspan` and `rowspan` merge from this cell, and
+what they cover is not written, so the next cell takes the next free column. `fill` is its
+background and `text` its letters (a run's `fill` is still its letters). `padding`, and
+`font`, `size`, `weight`, `lineHeight`, `italic`, `align`, `valign` for its words.
+`@plans.team.3.top` is an error: a row or a cell has no box.
+
+A cell's own edges go over the table's `lines`: `border` for all four, or `borderTop`,
+`borderRight`, `borderBottom`, `borderLeft`. Each is `none`, a width (`2`), a colour
+(`primary`), or both quoted with the width first (`"2 #1F2937"`); what is left out is the
+table's `stroke` or `strokeWidth`. On a `row` they are every one of its cells'. Where two
+cells share an edge a line beats `none`, and the heavier line beats the lighter.
 
 ## `group` — structure, and nothing else
 

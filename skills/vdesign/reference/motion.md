@@ -77,6 +77,12 @@ One `enter`, `exit` and `emphasis` line per node, one per line; any number of `m
 `stagger=80` ms apart (letters default to 30, words to 80). `stagger=` on a group or frame
 without `by` staggers its children. A line with pieces finishes when its last piece does.
 
+On a `chart`, `by=series` brings in one series at a time (300 ms apart) and `by=point` one
+category's bars, or a pie's slice, at a time (120 apart); its axes fade in with the first.
+`enter=grow` raises each bar from the zero line and each slice from the middle:
+`rev enter=grow by=series`. A pie has one series, so it takes `by=point`; a line's points are
+one stroke, so it takes `by=series`.
+
 **Holding.** `hold=1800` on an `enter` line stays that long, then leaves the way it came — the
 cheapest caption: `cap.1 enter=fade hold=1800`.
 
@@ -210,13 +216,14 @@ than beats and bars on a page with `bpm=`), a beat time or `on=` with no `bpm=`,
 20–300 or a `meter` outside 1–16, `on=` with `together` or `with=`, a second `music` line or a
 key it does not take (`fade`, `start`, `gain`), `from=` in beats, two
 effects or two start rules on one line, a `from=` that does not fit its effect, `by=` with
-anything but `cut fade rise drop pop`, `hold=` without `enter`, `count` as an exit, a camera
+anything but `cut fade rise drop pop` (on a chart, also `grow wipe`), `hold=` without `enter`, `count` as an exit, a camera
 line with an effect, a line that says nothing, or a second `enter`, `exit`, `emphasis` or `go`
 for one node. In a patch, naming a node that is not on the page is an error too.
 
 A **warning** keeps the line: a node that is not there or is on another page, a header that is
 not a page, a `go=#` or `to=` naming nothing, an `after=`/`with=` naming no line above, a `count` on text
-with no number, a `draw` on nothing stroked, `by=` on a node that is not text or is rotated,
+with no number, a `draw` on nothing stroked, `by=` on a node that is not text or is rotated (or for
+`series`/`point`, not a chart, or a pie by series or a line by point, which enter whole),
 `stagger=` on something with no children, a line that starts after `length`, and text on
 screen too briefly to read (`video-text-brief`). For music: no file yet (`music-missing`), a file
 that is not sound (`music-not-audio`), a track that ends before the video without `loop`

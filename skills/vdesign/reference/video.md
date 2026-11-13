@@ -45,7 +45,8 @@ motion promo w=1080 h=1350
 - **Kinetic headline:** `title enter=rise by=word stagger=80`, or `by=letter stagger=30` for a
   short word.
 - **Counter:** a text whose content is the final number, `value enter=count from=0`.
-- **Bars:** a group of rects, `bars enter=grow from=bottom stagger=120`.
+- **Bars:** a `chart` of the numbers, `bars enter=grow by=point` (a bar at a time) or
+  `by=series`. Each bar grows from the zero line.
 - **Underline or logo stroke:** a stroked `vector`, `enter=draw duration=600`.
 - **Lower third:** a group, `enter=wipe from=left hold=2500`.
 - **Captions:** most social video plays muted. One text per line of speech, each

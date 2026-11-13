@@ -1,43 +1,63 @@
-version 4
-kind design
+version 12
+kind slides
 title "Launch plan"
 $ink = #101014
 $paper = #fafafa
 $accent = #d64545
 $gap = 64
 
-frame intro x=0 y=0 w=1600 h=900 background=paper
-  text intro.title x=$gap y=240 w=1100 h=116 size=96 weight=800 fill=ink
+frame master x=0 y=1000 w=1600 h=900 background=paper component
+  text master.footer x=$gap y=(100% - 60) w=600 h=28 size=20 fill=ink opacity=0.6
+    "Acme · Spring release"
+  text master.number x=(100% - $gap - 120) y=(100% - 60) w=120 h=28 size=20 align=right fill=ink opacity=0.6
+    "1" field=number
+
+frame cover x=1700 y=1000 w=1600 h=900 name=Cover background=paper component
+  text cover.title x=$gap y=240 w=1100 h=116 size=96 weight=800 fill=ink slot hint=Title
+    "Deck title"
+  text cover.subtitle x=$gap y=(@cover.title.bottom + 24) w=900 h=39 size=32 fill=ink opacity=0.6 slot hint=Subtitle
+    "Subtitle"
+
+frame content x=3400 y=1000 w=1600 h=900 name="Title and content" component
+  instance content.chrome component=master x=0 y=0
+  text content.title x=$gap y=$gap w=1000 h=58 size=48 weight=800 fill=ink slot hint=Title
+    "Slide title"
+  frame content.body x=$gap y=240 w=(100% - $gap * 2) h=(100% - 360) slot hint="Text, chart or table"
+
+frame intro x=0 y=0 layout=cover
+  override title
     "Launch plan"
-  text intro.sub x=$gap y=(@intro.title.bottom + 24) w=900 h=39 size=32 fill=ink opacity=0.6
+  override subtitle
     "What ships, when, and what it costs"
   text intro.next x=$gap y=640 w=400 h=34 size=28 weight=700 fill=accent
     "See pricing →"
 
-frame plan x=1700 y=0 w=1600 h=900 background=paper
-  text plan.title x=$gap y=$gap w=1000 h=58 size=48 weight=800 fill=ink
+frame plan x=1700 y=0 layout=content
+  override title
     "Three steps"
-  text plan.one x=$gap y=320 w=((100% - $gap * 4) / 3) h=192 size=44
-    "1 " size=160 fill=accent
-    "Beta in May"
-  text plan.two x=(@plan.one.right + $gap) y=(prev.y) w=@plan.one.w h=192 size=44
-    "2 " size=160 fill=accent
-    "Open in June"
-  text plan.three x=(@plan.two.right + $gap) y=(prev.y) w=@plan.one.w h=192 size=44
-    "3 " size=160 fill=accent
-    "Teams in July"
+  slot body
+    text plan.one x=0 y=80 w=((100% - $gap * 2) / 3) h=192 size=44
+      "1 " size=160 fill=accent
+      "Beta in May"
+    text plan.two x=(@plan.one.right + $gap) y=(prev.y) w=@plan.one.w h=192 size=44
+      "2 " size=160 fill=accent
+      "Open in June"
+    text plan.three x=(@plan.two.right + $gap) y=(prev.y) w=@plan.one.w h=192 size=44
+      "3 " size=160 fill=accent
+      "Teams in July"
 
-frame pricing x=3400 y=0 w=1600 h=900 background=ink
-  text pricing.title x=$gap y=$gap w=1000 h=58 size=48 weight=800 fill=paper
+frame pricing x=3400 y=0 layout=content
+  override title
     "Pricing"
-  text pricing.price x=$gap y=300 w=800 h=154 size=128 weight=800 fill=accent
-    "$49 a month"
-  text pricing.back x=$gap y=780 w=200 h=34 size=28 fill=paper
+  slot body
+    text pricing.price x=0 y=60 w=800 h=154 size=128 weight=800 fill=accent
+      "$49 a month"
+  text pricing.back x=$gap y=780 w=200 h=34 size=28 fill=ink
     "← Back"
 
 motion intro enter=fade
   intro.title enter=rise
-  intro.sub enter=fade delay=150 together
+  intro.subtitle enter=fade delay=150 together
   intro.next enter=pop go=#pricing
 
 motion plan enter=push

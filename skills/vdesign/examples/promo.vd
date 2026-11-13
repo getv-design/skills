@@ -1,4 +1,4 @@
-version 4
+version 9
 kind design
 title "Pulse launch promo"
 $ink = #0e0e12
@@ -20,11 +20,8 @@ frame promo x=0 y=0 w=3400 h=1350 background=ink
       "12,480"
     text proof.label x=$pad y=(@proof.value.bottom + 8) w=(100% - $pad * 2) h=40 size=30 fill=muted
       "reports sent last week"
-    group proof.bars
-      rect proof.bar.1 x=$pad y=1150 w=120 h=90 fill=muted radius=12
-      rect proof.bar.2 x=(prev.right + 32) y=1090 w=120 h=150 fill=muted radius=12
-      rect proof.bar.3 x=(prev.right + 32) y=1010 w=120 h=230 fill=muted radius=12
-      rect proof.bar.4 x=(prev.right + 32) y=920 w=120 h=320 fill=lime radius=12
+    chart proof.bars x=$pad y=900 w=576 h=340 labels=W1,W2,W3,W4 axis=none gap=27 radius=12 size=26 fill=muted
+      series proof.sent values=3100,5200,7900,12480 fill=muted fills=,,,lime
   frame end x=2320 y=0 w=1080 h=1350 background=ink
     text end.logo x=$pad y=520 w=(100% - $pad * 2) h=170 size=140 weight=800 align=center fill=lime
       "pulse"
@@ -39,7 +36,7 @@ motion promo w=1080 h=1350
   camera proof delay=400
   proof.value enter=count from=0 together
   proof.label enter=fade with=proof.value
-  proof.bars enter=grow from=bottom stagger=120 after=proof.value
+  proof.bars enter=grow by=point after=proof.value
   camera end delay=600
   end.logo enter=pop
   end.cta enter=rise by=word stagger=60

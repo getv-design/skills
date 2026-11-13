@@ -44,6 +44,18 @@ Use one or the other, never both in a statement.
 Rewording is always `set`. Never `delete` and `insert` to change copy: the node loses its
 place in the document and every `@` reference to it breaks.
 
+A list is rewritten whole the same way, one `para` line per item; to add, drop or reorder
+an item, or turn a box into a list, send all its paragraphs:
+
+```vd-patch
+set s2.points
+  para bullet "Revenue up 24% on Q2"
+  para bullet level=2 "Teams accounts brought 40% of it"
+  para bullet "Churn held at 2%"
+```
+
+`content="…"` writes plain words and drops the list.
+
 A picture is put in a shape by naming the shape, and the crop is where the picture's own
 box sits under it (`reference/nodes.md`, "A picture in a shape"):
 
@@ -126,6 +138,25 @@ Renames the document. It is the same line a whole document opens with.
 
 ```vd-patch
 title "Jazz night poster"
+```
+
+## `kind`
+
+Makes a design a deck, or a deck a design; only the header changes. Not for a brand.
+
+```vd-patch
+kind slides
+```
+
+## `notes`
+
+Replaces one page's speaker notes with the quoted lines under it, a paragraph each; a bare
+`notes <page>` removes them.
+
+```vd-patch
+notes s2
+  "Lead with the 24%."
+  "Then churn."
 ```
 
 ## `motion`
@@ -212,6 +243,76 @@ no `rotation`. Rotation and corners are baked into the path; arcs stay curves.
   removed keeps where it was, as a number. Undo restores the inputs.
 - Merge only what should become one shape for good. To keep a ring editable as two
   circles, leave it as two circles.
+
+## Tables
+
+A table's rows and cells are nodes (`reference/nodes.md`), edited with the same verbs. A cell
+written without an id is its row's id and its column from 1, so the third cell of
+`plans.team` is `plans.team.3`:
+
+```vd-patch
+set plans.team.3 content="$249"
+set plans.team.3 fill=#FFE9A8 weight=700
+insert row plans.edu after plans.team
+  cell "Education"
+  cell "Up to 500"
+  cell "Free" align=right
+delete plans.solo
+set plans.head borderBottom="2 ink"
+```
+
+**A column is one cell in each row**, and the table's `cols` says its share. To add one, set
+`cols` and insert a cell into every row at its place, counting from 0; widen a cell that
+spans the table:
+
+```vd-patch
+set plans cols=2,1,1,1
+insert cell plans.head.sup in plans.head at 2
+  "Support"
+insert cell plans.team.sup in plans.team at 2
+  "Chat, same day"
+insert cell plans.org.sup in plans.org at 2
+  "Phone, 24/7"
+set plans.note.1 colspan=4
+```
+
+To remove one, set `cols` and delete that cell from every row (`delete plans.head.2`, and so
+on). Give each new cell an id, as above. A cell keeps the id it was read with, so after a
+column goes in or out, `plans.team.3` is still the cell that was third: read the ids from the
+document, do not count again.
+
+- **Merge** with `colspan` or `rowspan` on the first cell, and delete the cells it now covers;
+  **split** by setting it back to 1 and inserting cells in their place.
+- **A row taller than the table's box is `table-overflow`**: raise the table's `h`.
+
+## Slides on layouts
+
+A slide on a layout (`reference/nodes.md`) is edited by its page id. Its words are an
+override, its boxes take nodes with `in`, and a new slide is a page with `layout=` and no
+`w`/`h`:
+
+```vd-patch
+set s2.title
+  "Where we stand"
+insert chart s3.mix in s3.right x=0 y=0 w=(100%) h=(100%) kind=doughnut labels=A,B
+  series s3.mix.share values=60,40
+insert frame s5 after s4 x=5520 y=0 layout=content
+  override title
+    "Next steps"
+  slot body
+    text s5.list x=0 y=0 w=(100%) h=(100%) size=32
+      "Hire two engineers"
+set s3 layout=content
+```
+
+- **`set s3 layout=content`** moves a slide: its words and slot content carry over by key,
+  then into empty slots. What finds no slot stays on the page at the x and y it had in its
+  slot and comes back as `unplaced-content`: move it into a slot or place it.
+- **A new slide sits beside the last**, its `x` the last slide's plus its width and 100.
+- **To change every slide**, `set` the layout's own node (`set content.title size=52`) or
+  the master's; set on a slide, it changes that slide only.
+- **A slide's parts are not inserted into, moved or deleted**, except into a slot. Hide one
+  with `set s2.chrome hidden`.
 
 ## Things worth knowing
 
