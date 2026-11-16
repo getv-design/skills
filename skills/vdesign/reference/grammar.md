@@ -139,7 +139,8 @@ text poster.title x=64 y=120 w=560 h=64 size=48 weight=700 fill="linear-gradient
   the farthest corner.
 - A stop is a colour or a token name, with an optional `%`. `transparent` fades the
   neighbouring colour out, as in CSS.
-- A gradient spans the node's box; on text it sweeps across the whole box, not each run.
+- A gradient spans the node's box; on a text node's own `fill` it sweeps the whole box, and on a
+  run's `fill` it sweeps that run, over every line the run wraps onto.
 - Not supported: `conic-gradient`, `repeating-*`, sizes such as `closest-side`, and a token
   holding a gradient used as a stop of another gradient.
 - **Layers.** A shape's `fill` and a frame's or canvas's `background` take a list, first on top, as a

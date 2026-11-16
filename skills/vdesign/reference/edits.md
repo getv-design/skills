@@ -192,6 +192,17 @@ replace brand ember@4
 In a design that uses a brand, `replace theme dark` sets dark values a line at a time, and
 `delete theme dark $primary` removes one; `delete theme dark` removes the block.
 
+`replace font display = Fraunces` writes a font as a document writes it, with its `fallback`
+and `face` lines under it: the family stands in for the one with that name, or is added. A
+`role` or `logo` line is refused in a design, which holds a brand's roles as tokens
+(`set $primary = …`) and its logo as a picture.
+
+```vd-patch
+replace font display = Fraunces
+  fallback "Georgia, serif"
+  face asset=ember-fraunces-600 weight=600
+```
+
 ```vd-patch
 replace theme dark
   $primary = #F06A3F

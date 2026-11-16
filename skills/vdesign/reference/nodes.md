@@ -300,7 +300,7 @@ text s2.points x=64 y=160 w=640 h=300 size=28
 `bullet` or `number` makes a list item, counted per `level` (1–9, each further in);
 `marker` is a bullet's glyph or a number's pattern (`1.` `1)` `(1)` `a.` `A)` `i.` `I.`),
 `start` the first number. A marker is drawn as its words are; `markerFill=primary` gives it
-its own colour and `markerScale=0.8` its own size, as a multiple of the words'. `align` and `lineHeight` are the paragraph's own; `before` and
+its own colour and `markerScale=0.8` its own size, as a multiple of the words'; `markerFont="Wingdings"` names the face it is set in (the canvas's own stands in where it is not installed). `align` and `lineHeight` are the paragraph's own; `before` and
 `after` are px of space around it. `indent` and `hang` (px: where its lines start, how far
 the first hangs left) are rarely needed. Several runs go on lines indented under the `para`.
 Once a body has `para` lines every paragraph is one (`para "Words"` for a plain one).
@@ -421,6 +421,8 @@ connector rule x1=40 y1=500 x2=520 y2=500 stroke=muted dash="4 4"
 ```
 
 - `route=`: `straight` (default), `elbow` or `curve`. An end on a side leaves along it.
+  To say otherwise: `leave` and `arrive` are `across` or `down` (across then down
+  turns once), and `bend` is where a two-turn elbow turns, as a share of the way (0.5).
 - `start=`, `end=`: `none` (default), `arrow`, `triangle`, `dot`, `bar`.
 - A dark line 2 wide, or `stroke` and `strokeWidth`; also `dash`, `cap`, `opacity`,
   `blend`, `shadow`, `blur`.
@@ -439,17 +441,25 @@ chart rev x=40 y=200 w=720 h=400 kind=column labels=Q1,Q2,Q3 format="$#,##0" gri
 ```
 
 - `x`, `y`, `w`, `h`: the whole chart, key included. `kind`: `column` (default), `bar`,
-  `line`, `area`, `pie`, `doughnut`, `scatter`, `km`; a pie draws its first series.
+  `line`, `area`, `pie`, `doughnut`, `scatter`, `km`, `radar`; a pie draws its first series.
 - `labels`: one per value, commas and no spaces; quote one with a space or comma:
   `labels="North America",Europe`.
 - Bare flags: `stacked`, `percent` (stacked to 100%), `grid`, `numbers` (each value
-  written on), `smooth` and `markers` (lines).
+  written on), `smooth` and `markers` (lines), `filled` (a radar's polygons).
 - `legend`: `none` `top` `bottom` `left` `right`, shown unasked for several series or a pie.
   `axis=none` hides the value axis.
 - `format`: a spreadsheet code, `0.0`, `"$#,##0"`, `0%`, `#,##0,"k"`. Values are plain
   numbers: `0.12` with `format=0%`, never `12%`.
-- `min`, `max`: the value axis' ends, else from the data with 0. `gap`: between categories,
-  % of a bar (60). `hole`: a doughnut's, % (55). `radius`: bar corners.
+- `min`, `max`: the value axis' ends, else from the data with 0. `step`: between its
+  ticks, else a nice number (`xstep` for a scatter's horizontal axis). `gridDash="4 3"`
+  dashes the grid. `gap`: between categories, % of a bar (60). `hole`: a doughnut's, %
+  (55). `radius`: bar corners.
+- `plot=0.1,0.2,0.8,0.6` and `legendAt=0.2,0,0.6,0.15`: where the plot's inside and the
+  key sit, as `x,y,w,h` fractions of the chart's box. Leave them out unless asked; the
+  runtime places both.
+- `radar`: the labels as spokes round a circle, first at twelve o'clock and clockwise, over
+  rings of the value axis (`min`, `max`, `step`, `grid`); one outline per series, `filled`
+  for washes, `markers` for a dot at each value. Needs three or more labels.
 - `scatter`: a dot at each pair, on two number axes fitted to the data (no zero needed).
   Each series gives `xvalues=` beside `values=`, one per value; no `labels`. `xmin`,
   `xmax`: the horizontal axis' ends.
@@ -459,7 +469,8 @@ chart rev x=40 y=200 w=720 h=400 kind=column labels=Q1,Q2,Q3 format="$#,##0" gri
   `xvalues=` (step times), `values=` (survival in percent, 85 not 0.85) and `censored=`
   (tick times). Flags: `median` (dashed at 50%), `band` (95% CI) and `risk` (number at
   risk under the axis) — `band` and `risk` need `events`. `xmin`, `xmax` as a scatter.
-- `font`, `size`, `fill`: its text. `stroke`: axis and grid lines. `opacity`.
+- `font`, `size`, `fill`: its text; `legendSize` and `numberSize` when the key or the
+  values differ. `stroke`: axis and grid lines. `opacity`.
 - Exported to PowerPoint it stays a chart, its data editable there; drawn as rects it
   would be loose shapes.
 
@@ -471,6 +482,13 @@ pie's slices, or `fills=,,,lime` to pick out one bar). In a scatter, `xvalues` p
 points: `series fit xvalues=152,160,171 values=51,58,70`. In a `km`, `events` or `censored`
 go beside them: `series os.a xvalues=6,6,9,10 events=1,1,0,1`. Change one with
 `set rev.b values=15,22,40`.
+
+A combination: over a `column` or `bar` chart a series may say `kind=line` (a line through
+its values) or `kind=scatter` (marks at `xvalues`, `values`, on the bars' value axis; the
+other number runs along the categories, 0 to their count or `xmin` to `xmax`). A line or
+scatter series takes `marker` (`none` `circle` `square` `diamond` `triangle`),
+`markerSize` and `width` (a line's thickness; on scatter marks it joins them).
+`unlisted` leaves a series out of the key.
 
 ## `table` — a grid of text, laid out by the runtime
 

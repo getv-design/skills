@@ -53,9 +53,12 @@ frame poster w=1080 h=1350 background=paper
   `version 12` and `kind slides`; anything else, or when unsure, `kind design`, the
   free-form canvas. The one other kind is a brand, `version 5` and `kind brand`, which
   `reference/brand.md` covers — make one only when asked for a brand.
-- **A design in a brand** has a `brand ember@3` line under its title. Read the brand's brief
-  first (`vd_read_brand`), name its roles in paint (`fill=primary`, `background=background`)
-  and never write a colour out, and never write the brand line yourself: `vd_apply_brand` does.
+- **Before you design, look for a brand.** Call `vd_list_brands`: a new design starts in the
+  brand marked default, unless the person names another or says to use none. A brand is put on
+  a design by you, from `reference/brand.md`: read it, add its files (`vd_add_brand_files`),
+  write the brand line, a token per role, the fonts and the logo, and carry out its rules.
+  A design in a brand has a `brand ember@3` line under its title; name its roles in paint
+  (`fill=primary`, `background=background`) and never write a colour out.
 - **Then `title "…"`** — a short human name for what you are making, two to five words
   ("Jazz night poster", not "Document"). It is what the tab shows, so write it before the
   first page: the name should appear while the design is still arriving.
