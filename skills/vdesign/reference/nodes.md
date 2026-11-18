@@ -454,6 +454,12 @@ chart rev x=40 y=200 w=720 h=400 kind=column labels=Q1,Q2,Q3 format="$#,##0" gri
   ticks, else a nice number (`xstep` for a scatter's horizontal axis). `gridDash="4 3"`
   dashes the grid. `gap`: between categories, % of a bar (60). `hole`: a doughnut's, %
   (55). `radius`: bar corners.
+- `categoryTitle="Age group"` and `valueTitle="Rate per 100,000"`: the axes' titles, by what
+  each axis carries (a bar chart's categories run up the side, so its `categoryTitle` goes
+  there). Drawn at the edge of the chart, the value title reading upward. Neither on a pie,
+  a doughnut or a radar. Version 14, written by a document that has one. Category labels
+  of several words wrap onto up to three lines and are all shown; one that would still
+  touch its neighbour is thinned.
 - `plot=0.1,0.2,0.8,0.6` and `legendAt=0.2,0,0.6,0.15`: where the plot's inside and the
   key sit, as `x,y,w,h` fractions of the chart's box. Leave them out unless asked; the
   runtime places both.
