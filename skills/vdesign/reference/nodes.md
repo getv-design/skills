@@ -410,6 +410,18 @@ notes s2
   "Churn is flat, not falling."
 ```
 
+### Sections: `section`
+
+A deck's slides can be grouped, as PowerPoint's slide sorter does: `section <page id> "Name"`
+after the pages starts a section at that page, and it runs to the next one. Pages before the
+first belong to none. One line each; nothing draws it; PowerPoint export writes the section
+list. There are no empty sections: a section is where its first slide is.
+
+```vd
+section s1 "Intro"
+section s4 "Strategy"
+```
+
 ## `connector` — a line, or an arrow joining nodes
 
 Placed by its ends, `x1`, `y1`, `x2`, `y2`, not a box. An end written as a reference

@@ -159,6 +159,15 @@ notes s2
   "Then churn."
 ```
 
+## `section`
+
+Starts a section at a page, or renames the one that starts there; a bare `section <page>`
+ends it, and its slides join the section before.
+
+```vd-patch
+section s4 "Strategy"
+```
+
 ## `motion`
 
 Replaces one page's whole motion block with the lines under it; a bare `motion <page>`
