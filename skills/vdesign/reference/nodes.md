@@ -476,7 +476,9 @@ chart rev x=40 y=200 w=720 h=400 kind=column labels=Q1,Q2,Q3 format="$#,##0" gri
   (tick times). Flags: `median` (dashed at 50%), `band` (95% CI) and `risk` (number at
   risk under the axis) — `band` and `risk` need `events`. `xmin`, `xmax` as a scatter.
 - `font`, `size`, `fill`: its text; `legendSize` and `numberSize` when the key or the
-  values differ. `stroke`: axis and grid lines. `opacity`.
+  values differ; `numberFill` and `numberWeight` colour and weight those values;
+  `titleWeight` the axis titles'. `stroke`:
+  axis and grid lines. `opacity`.
 - Exported to PowerPoint it stays a chart, its data editable there; drawn as rects it
   would be loose shapes.
 
@@ -494,7 +496,10 @@ its values) or `kind=scatter` (marks at `xvalues`, `values`, on the bars' value 
 other number runs along the categories, 0 to their count or `xmin` to `xmax`). A line or
 scatter series takes `marker` (`none` `circle` `square` `diamond` `triangle`),
 `markerSize` and `width` (a line's thickness; on scatter marks it joins them).
-`unlisted` leaves a series out of the key.
+`unlisted` leaves a series out of the key; `unnumbered` writes no values on that series
+when its parent chart writes them; `errors=` and `errorsMinus=` (one reach per value) draw
+error bars, with `errorsBare`, `errorFill` and `errorWidth`; `dashFrom=` draws a line
+dashed from that value on; `hatch=` (indexes) and `hatchFill` hatch those bars; `width=0` on a line series draws marks without a line.
 
 ## `table` — a grid of text, laid out by the runtime
 
